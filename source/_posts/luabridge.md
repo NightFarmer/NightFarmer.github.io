@@ -1,5 +1,5 @@
 ---
-title: Android热更新/热补丁终极解决方案
+title: 有关Android热更新/热补丁的一种新的解决方案
 date: 2016-08-10 14:17:23
 tags: [Android, Lua, 热更新, NDK]
 category: Android
