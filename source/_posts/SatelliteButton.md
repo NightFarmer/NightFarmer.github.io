@@ -6,7 +6,7 @@ category: Android
 ---
 
 卫星菜单算是一个非常久远的控件效果了，到现在也存在了各种各样的开源的此类控件，至于为什么要重复造轮子，是因为翻阅了一些卫星菜单的实现源码发现这些代码水平参差不齐，无论是从整体设计或是逻辑实现或是代码简洁度以及扩展性上都没有找到比较满意的。
-鉴于这个效果的实现并不复杂，还有昨天刚好做了个轮子([上篇](http://nightfarmer.github.io/2016/08/03/make-a-wheel/))，所以打算做一个可复用/可灵活配置/具有较好封装/可用当做普通View来使用的卫星菜单控件。
+鉴于这个效果的实现并不复杂，还有昨天刚好做了个轮子([上篇](http://nightfarmer.github.io/2016/08/03/make-a-wheel/))，所以打算做一个可复用/可灵活配置/具有较好封装/可以当做普通View来使用的卫星菜单控件。
 老规矩先上效果图：
 ![不靠边360度示例](http://nightfarmer.github.io/public/static/image/satellite1.gif) ![靠角90度示例](http://nightfarmer.github.io/public/static/image/satellite2.gif) ![靠边180度示例](http://nightfarmer.github.io/public/static/image/satellite3.gif)
 <!-- more -->
