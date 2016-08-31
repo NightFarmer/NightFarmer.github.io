@@ -8,7 +8,7 @@ category: Android
 说起响应试编程，要提到的当然是Rx系列的库了，Rx系列的库对于很多语言和平台的运用是非常广泛的，例如(.NET,Java, Scala, Clojure, JavaScript, Ruby, Python, C++, Objective-C/Cocoa, Groovy等等。而本篇将会记录如何使用RxJava对Android点击事件的监听以异步数据流的方式来进行处理，从而实现对多次点击事件的监听。
 多次点击事件的监听在Android中应用还是比较广泛的，比如“再次点击关闭应用程序”，又比如7次连续点击开启开发者模式等等。常规的设计无非是定义一个变量来记录点击的时间差或者定义一个线程来重置连击标识，然而这样的设计写出来的代码并不好看，而且可读性不高不易扩展。但是使用RxJava来实现就不会有上述这些问题了，而代码非常简洁。
 上示例图：
-![多次点击示例](https://github.com/googlesamples/android-architecture/wiki/images/RxAndroidClick.png)
+![多次点击示例](http://nightfarmer.github.io/public/static/image/RxAndroidClick.gif)
 <!-- more -->
 
 RxJava作为Rx系列在Java平台的实现用于Android开发在适合不过了，同时另外一个库RxAndroid作为Rx在Android平台特殊特性的支持也是必然要用上的。而RxBinding库提供了对View点击事件的Rx形式监听。
