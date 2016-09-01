@@ -22,3 +22,18 @@ date: 2016-03-06 03:06:20
 <label style="display:inline-block;width:120px;">Node.js</label>★★★★★☆☆☆☆☆☆
 </div>
 
+# 个人作品
+
+占位
+
+# 开源库
+
+<div style="width: auto; max-width: 600px;">
+	<div class="github-widget" data-repo="NightFarmer/ThemeLib"></div>
+	<div class="github-widget" data-repo="NightFarmer/RecyclerTree"></div>
+	<div class="github-widget" data-repo="NightFarmer/ZXing"></div>
+	<div class="github-widget" data-repo="NightFarmer/DraggableRecyclerView"></div>
+	<div class="github-widget" data-repo="NightFarmer/LightDialog"></div>
+	<script type="text/javascript" src="./GithubRepoWidget.js"></script>
+</div>
+
