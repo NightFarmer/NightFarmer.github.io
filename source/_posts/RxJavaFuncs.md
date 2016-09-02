@@ -1,13 +1,13 @@
 ---
 title: RxJava常用操作符分类总汇
 date: 2016-09-01 15:38:23
-tags: [Android, RxJava]
+tags: [Android, RxJava, 干货]
 category: Android
 ---
 
-[上文](http://nightfarmer.github.io/2016/08/31/RxJavaClick/)提到ReactiveX在多种语言和平台上都存在着字节的实现，同时也都实现了一组操作符，各个语言平台中的操作符实现有一些是重叠的，也有一些只存在于特定的平台实现中。每种实现都会根据当前平台的命名规范给这些操作符定义相似的命名。
-本文收集了Java平台Rx的一些常用操作符，并对这些操作符进行分类并简单注释这些操作符的用法和含义。
-
+[上文](http://nightfarmer.github.io/2016/08/31/RxJavaClick/)提到ReactiveX在多种语言和平台上都存在着自己的实现，同时也都实现了一套操作符，在这些语言平台中有一些操作符的实现是重叠的，也有一些只存在于特定的平台实现中。每种实现都会根据当前平台的命名规范给这些操作符定义相似的命名。
+本文收集了Java平台Rx的一些常用操作符，并对这些操作符进行分类并简单注释这些操作符的含义和用法。
+<!-- more -->
 #### 创建
 `create` 提供一个回调对象，通过对回调方法中传入的subscriber进行操作实现对订阅者的操作。
 `just` 传入一个或多个对象，生成一个Observable，并会依次发射这些对象
@@ -21,110 +21,100 @@ category: Android
 
 
 #### 变换
+这些操作符可用于对Observable发射的数据进行变换，详细解释可以看每个操作符的文档
 `map` 映射，将一种类型的数据流/Observable映射为另外一种类型的数据流/Observable
+`cast` 强转 传入一个class,对Observable的类型进行强转.
 `buffer` 缓存/打包 按照一定规则从Observable收集一些数据到一个集合，然后把这些数据作为集合打包发射。
 `flatMap` 平铺映射，从数据流的每个数据元素中映射出多个数据，并将这些数据依次发射。
-`groupby` 
-`scan`
-`window`
-
-这些操作符可用于对Observable发射的数据进行变换，详细解释可以看每个操作符的文档
-
-变换操作
-这些操作符可用于对Observable发射的数据进行变换，详细解释可以看每个操作符的文档
-Buffer — 缓存，可以简单的理解为缓存，它定期从Observable收集数据到一个集合，然后把这些数据集合打包发射，而不是一次发射一个
-FlatMap — 扁平映射，将Observable发射的数据变换为Observables集合，然后将这些Observable发射的数据平坦化的放进一个单独的Observable，可以认为是一个将嵌套的数据结构展开的过程。
-GroupBy — 分组，将原来的Observable分拆为Observable集合，将原始Observable发射的数据按Key分组，每一个Observable发射一组不同的数据
-Map — 映射，通过对序列的每一项都应用一个函数变换Observable发射的数据，实质是对序列中的每一项执行一个函数，函数的参数就是这个数据项
-Scan — 扫描，对Observable发射的每一项数据应用一个函数，然后按顺序依次发射这些值
-Window — 窗口，定期将来自Observable的数据分拆成一些Observable窗口，然后发射这些窗口，而不是每次发射一项。类似于Buffer，但Buffer发射的是数据，Window发射的是Observable，每一个Observable发射原始Observable的数据的一个子集
+`groupby` 分组，将原来的Observable分拆为Observable集合，将原始Observable发射的数据按Key分组，每一个Observable发射一组不同的数据
+`to...` 将数据流中的对象转换为List/SortedList/Map/MultiMap集合对象，并打包发射
+`timeInterval` 将每个数据都换为包含本次数据和离上次发射数据时间间隔的对象并发射
+`timestamp` 将每个数据都转换为包含本次数据和发射数据时的时间戳的对象并发射
 
 #### 过滤
-Debounce — 只有在空闲了一段时间后才发射数据，通俗的说，就是如果一段时间没有操作，就执行一次操作
-Distinct — 去重，过滤掉重复数据项
-ElementAt — 取值，取特定位置的数据项
-Filter — 过滤，过滤掉没有通过谓词测试的数据项，只发射通过测试的
-First — 首项，只发射满足条件的第一条数据
-IgnoreElements — 忽略所有的数据，只保留终止通知(onError或onCompleted)
-Last — 末项，只发射最后一条数据
-Sample — 取样，定期发射最新的数据，等于是数据抽样，有的实现里叫ThrottleFirst
-Skip — 跳过前面的若干项数据
-SkipLast — 跳过后面的若干项数据
-Take — 只保留前面的若干项数据
-TakeLast — 只保留后面的若干项数据
+`debounce` 传入时间间隔/时间单位/调度线程/，**如果超过这段时间没有新的数据传入**，则从数据流中获取最后一个数据进行发射，其他的数据则忽略掉。
+`distinct` 去重，过滤掉重复数据项
+`elementAt` 从数据流中取第几个数据项
+`filter` 过滤，从数据流中只去满足条件的数据用来发射
+`first/last` 传入或不传入条件，只发射第一个/最后一个或第一个/最后一个满足条件的数据。
+`ignoreElements` 忽略所有数据，只保留终止通知(onError或onCompleted)
+`sample` 取样，**定期**抽取一条最新的数据，发射
+`throttleFirst` 传入时间，**等待**并从数据流中取新数据，**如果距离上次发射的时间间隔大于这个时间**，则发射这条数据，反之忽略
+`throttleLast` 传入时间，**定期**从数据流中取最新的数据，忽略本次与上次发射数据之间的数据。效果与`sample`相似
+`skip/skipLast` 传入数目或时间，跳过前面/后面的几个数据或这段时间内的数据
+`take/takeLast` 传入数目或时间，只取前面/后面的几个数据或这段时间内的数据
 
 #### 组合
 组合操作符用于将多个Observable组合成一个单一的Observable
-And/Then/When — 通过模式(And条件)和计划(Then次序)组合两个或多个Observable发射的数据集
-CombineLatest — 当两个Observables中的任何一个发射了一个数据时，通过一个指定的函数组合每个Observable发射的最新数据（一共两个数据），然后发射这个函数的结果
-Join — 无论何时，如果一个Observable发射了一个数据项，只要在另一个Observable发射的数据项定义的时间窗口内，就将两个Observable发射的数据合并发射
-Merge — 将两个Observable发射的数据组合并成一个
-StartWith — 在发射原来的Observable的数据序列之前，先发射一个指定的数据序列或数据项
-Switch — 将一个发射Observable序列的Observable转换为这样一个Observable：它逐个发射那些Observable最近发射的数据
-Zip — 打包，使用一个指定的函数将多个Observable发射的数据组合在一起，然后将这个函数的结果作为单项数据发射
+`concat` **拼接** 将多个/Array/List集合的Observable**拼接**为一个Observable，并按传入的Observable的顺序依次发射数据。
+`merge` **合并** 将多个/Array/List集合的Observable**合并**为一个Observable，并按所有数据的顺序依次发射数据
+`startWith` 传入一个/多个数据/Observable，在本Observable的数据发射前，首先把传入的数据流全部依次发射。
+`zip` 打包 将两个或多个Observable的数据流并行打包，每次从各个Observable各取一个数据，通过合并函数合并为一个数据后，发射数据。每次打包都会对每个Observable等待最新的数据.
+`combineLatest` 打包 和zip类似, 区别在于每次打包不等待，任何一个Observable发射数据都会打包一次, 其他Observable则取最近发射的数据.
+`Join` 无论何时，如果一个Observable发射了一个数据项，只要在另一个Observable发射的数据项定义的时间窗口内，就将两个Observable发射的数据合并发射 
+`switchOnNext` 切换 若存在一个发射Observable的Observable, switchOnNext会在发射Observable时将Observable中的数据发射出去, 若第二个Observable开始发射,则上一个被发射的Observable中的数据停止发射.
 
 
 #### 错误处理
 这些操作符用于从错误通知中恢复
-Catch — 捕获，继续序列操作，将错误替换为正常的数据，从onError通知中恢复
-Retry — 重试，如果Observable发射了一个错误通知，重新订阅它，期待它正常终止
+`retry` 重试 传入重试次数或重试判断函数，当异常时按次数从头重试，或根据判断函数判断是否从头重试。
+`onErrorReturn` 替换异常，当发生error时，返回根据异常返回一个正常的数据，代替error数据，并以complete终止数据流
+`onErrorResumeNext` 替换异常，当发生error时，根据异常返回一个Observable，以这个Observable中的数据代理error数据发射，并以complete终止数据流
+`onExceptionResumeNext` 与onErrorResumeNext相似，不过只替换Exception类型的异常，对Throwable类型的则不处理，会onError
 
 #### 辅助
 
 辅助操作
 
 一组用于处理Observable的操作符
-
-Delay — 延迟一段时间发射结果数据
-Do — 注册一个动作占用一些Observable的生命周期事件，相当于Mock某个操作
-Materialize/Dematerialize — 将发射的数据和通知都当做数据发射，或者反过来
-ObserveOn — 指定观察者观察Observable的调度程序（工作线程）
+`delay` 延迟一段时间发射数据
+`doOn...` 在某个事件时被回调
+`observeOn` 指定观察者被通知时的调度线程
+`subscribeOn`指定Observable应该在哪个调度程序上执行
+`subscribe` 注册观察者的监听回调用于接收数据，并触发Observable的OnSubscribe的call方法，通知Observable一切就绪。变换/过滤操作符在subscribe方法调用前并不会被执行。
+`timeout` 传入时间和单位，超过这段事件没有接收到数据，就会发送一个error。
+`materialize/dematerialize` 将数据包装进Notification，并带有Kind(OnNext/OnError/OnCompleted)，合并三个类型的回调到onNext，Dematerialize是反过程
 Serialize — 强制Observable按次序发射数据并且功能是有效的
-Subscribe — 收到Observable发射的数据和通知后执行的操作
-SubscribeOn — 指定Observable应该在哪个调度程序上执行
-TimeInterval — 将一个Observable转换为发射两个数据之间所耗费时间的Observable
-Timeout — 添加超时机制，如果过了指定的一段时间没有发射数据，就发射一个错误通知
-Timestamp — 给Observable发射的每个数据项添加一个时间戳
-Using — 创建一个只在Observable的生命周期内存在的一次性资源
-条件和布尔操作
+`using` 创建一个Observable，传入三个函数，第一个函数生成并返回一个资源，第二个函数传入由第一个函数生成的资源并生成一个Observable作为Observable，第三个函数在Observable完成注销后调用，传入第一个函数生成的资源进行回收处理。
+
+#### 条件和布尔操作
 
 这些操作符可用于单个或多个数据项，也可用于Observable
+`all` 依次根据函数判断所有数据项，判断所有数据是否全部满足条件，并只回调一次订阅监听。
+`amb` 传入多个Observable，他们是竞争关系，哪个Observable首先发射数据，则只发射这个Observable的数据，忽略其他的Observable的所有数据。
+`contains` 传入一个数据，判断数据流中的数据是否包含本数据，并只回调一次订阅监听。
+`defaultIfEmpty` 传入一个数据，如果数据流为空的时候发射本数据。
+`sequenceEqual` 传入两个Observable和一个判断函数，判断两个数据队列是否是相同的序列，并只回调一次订阅监听。
+`skipWhile` 传入一个判断函数，从数据流中的第一个数据开始依次判断，如果满足条件则跳过，如果不满足则开始依次发射后续的所有数据
+`takeWhile` 传入一个判断函数，如果从数据流中获取到的数据满足判断条件，则发射此数据，如果不满足则忽略以后所有数据。
+`skipUtil` 传入一个Observable，在这个Observable发射数据之前原始Observable的所有数据都被忽略，直到传入的Observable发出第一个数据，则原始Observable开始发射数据
+`takUtil` 传入一个Observable，在这个Observable发射数据之前原始Observable的所有数据都被正常发射，直到传入的Observable发出第一个数据，则原始Observable忽略后续的所有数据
 
-All — 判断Observable发射的所有的数据项是否都满足某个条件
-Amb — 给定多个Observable，只让第一个发射数据的Observable发射全部数据
-Contains — 判断Observable是否会发射一个指定的数据项
-DefaultIfEmpty — 发射来自原始Observable的数据，如果原始Observable没有发射数据，就发射一个默认数据
-SequenceEqual — 判断两个Observable是否按相同的数据序列
-SkipUntil — 丢弃原始Observable发射的数据，直到第二个Observable发射了一个数据，然后发射原始Observable的剩余数据
-SkipWhile — 丢弃原始Observable发射的数据，直到一个特定的条件为假，然后发射原始Observable剩余的数据
-TakeUntil — 发射来自原始Observable的数据，直到第二个Observable发射了一个数据或一个通知
-TakeWhile — 发射原始Observable的数据，直到一个特定的条件为真，然后跳过剩余的数据
-算术和聚合操作
+####  算术和聚合操作
 
 这些操作符可用于整个数据序列
+`count` 计算Observable发射的数据个数，然后发射这个数字。
+`reduce` 传入计算函数，根据初始值和每次计算的结果对每个数据进行计算，并将计算结果传入下个数据的计算参数，将最终结果发射。
+`collect` 和reduce类似，不过不是计算而是对象的聚合，传入两个函数，第一个是结构体的初始化并返回，第二个是聚合函数，用于聚合的结构体和每个数据传入并将数据聚合到结构体中，最终将聚合完成的结构体发射给订阅者
+`scan` 和reduce一样
+`window` 和buffer类似, 不同之处在于返回的聚合对象是Observable
 
-Average — 计算Observable发射的数据序列的平均值，然后发射这个结果
-Concat — 不交错的连接多个Observable的数据
-Count — 计算Observable发射的数据个数，然后发射这个结果
-Max — 计算并发射数据序列的最大值
-Min — 计算并发射数据序列的最小值
-Reduce — 按顺序对数据序列的每一个应用某个函数，然后返回这个值
-Sum — 计算并发射数据序列的和
-连接操作
+#### 连接操作
 
 一些有精确可控的订阅行为的特殊Observable
 
-Connect — 指示一个可连接的Observable开始发射数据给订阅者
-Publish — 将一个普通的Observable转换为可连接的
-RefCount — 使一个可连接的Observable表现得像一个普通的Observable
-Replay — 确保所有的观察者收到同样的数据序列，即使他们在Observable开始发射数据之后才订阅
-转换操作
+`share`share保证引用的是同一个资源，而不是subscriber在不同的时间点订阅，会收到准确的相同的数据，是publish和refcount调用立案的包装，等价于.publish().refcount()。
+`publish` 将一个普通的Observable转换为可连接的，可连接的Observable在调用.connect之前接受不到任何数据
+`refCount` 使一个可连接的Observable表现得像一个普通的Observable
+`connect` 指示一个可连接的Observable开始发射数据给订阅者
+`replay` 确保所有的观察者收到同样的数据序列，即使他们在Observable开始发射数据之后才订阅
 
-To — 将Observable转换为其它的对象或数据结构
-Blocking 阻塞Observable的操作符
+
+#### 其他
+`toBlocking` 阻塞Observable的操作符。可用与单元测试中，在subscribe之前调用，使方法阻塞等待便于观察测试过程。
 操作符决策树
 
-几种主要的需求
+#### 几种主要的需求
 
 直接创建一个Observable（创建操作）
 组合多个Observable（组合操作）
