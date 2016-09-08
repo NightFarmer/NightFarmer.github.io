@@ -29,6 +29,7 @@ date: 2016-03-06 03:06:20
 # 开源库
 
 <div style="width: auto; max-width: 600px;">
+	<div class="github-widget" data-repo="NightFarmer/Themer"></div>
 	<div class="github-widget" data-repo="NightFarmer/ThemeLib"></div>
 	<div class="github-widget" data-repo="NightFarmer/RecyclerTree"></div>
 	<div class="github-widget" data-repo="NightFarmer/ZXing"></div>
