@@ -72,6 +72,7 @@ category: Android
 `observeOn` 指定观察者被通知时的调度线程
 `subscribeOn`指定Observable应该在哪个调度程序上执行
 `subscribe` 注册观察者的监听回调用于接收数据，并触发Observable的OnSubscribe的call方法，通知Observable一切就绪。变换/过滤操作符在subscribe方法调用前并不会被执行。
+`foreach` subscribe的别名
 `timeout` 传入时间和单位，超过这段事件没有接收到数据，就会发送一个error。
 `materialize/dematerialize` 将数据包装进Notification，并带有Kind(OnNext/OnError/OnCompleted)，合并三个类型的回调到onNext，Dematerialize是反过程
 Serialize — 强制Observable按次序发射数据并且功能是有效的
