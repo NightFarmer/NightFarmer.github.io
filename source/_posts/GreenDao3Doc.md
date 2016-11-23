@@ -489,8 +489,10 @@ First name is "Joe" AND (year of birth is greater than 1970 OR (year of birth is
 ```java
 QueryBuilder qb = userDao.queryBuilder();
 qb.where(Properties.FirstName.eq("Joe"),
-qb.or(Properties.YearOfBirth.gt(1970),
-qb.and(Properties.YearOfBirth.eq(1970), Properties.MonthOfBirth.ge(10))));
+    qb.or(Properties.YearOfBirth.gt(1970),
+        qb.and(Properties.YearOfBirth.eq(1970), Properties.MonthOfBirth.ge(10))
+    )
+);
 List youngJoes = qb.list();
 ```
 
