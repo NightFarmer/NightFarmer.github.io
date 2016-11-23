@@ -1,5 +1,5 @@
 ---
-title: SQLite数据库Orm框架GreenDao3的使用详解
+title: SQLite数据库Orm框架GreenDao3使用详解
 date: 2016-11-21 09:44:55
 tags: [Android, 数据库, orm]
 category: Android
@@ -636,6 +636,97 @@ QueryBuilder.LOG_SQL = true;
 QueryBuilder.LOG_VALUES = true;
 ```
 开启这个标识将会在build方法被调用时打印sql语句和传入的参数。可以将这些值和你实际预期的语句进行比较，也可以将这些拷贝到sql管理器中进行执行。
+
+### 连表查询
+一些特殊的查询需要从多个实体类(表)中查询数据库，在使用SQL的时候通过join操作符对两张过更多的表进行关联查询是常有的事情。
+假设我们有一个User表，还有一个存在着一对多关系的Address表(一个User有多个Address)。然后我们要查询联系地址包含“Sesame Street”的所有User：我们必须把Address表和User表通过userId关联起来，并使用where条件来获得查询结果。
+```java
+QueryBuilder<User> queryBuilder = userDao.queryBuilder();
+queryBuilder.join(Address.class, AddressDao.Properties.userId)
+  .where(AddressDao.Properties.Street.eq("Sesame Street"));
+List<User> users = queryBuilder.list();
+```
+join()方法需要传入一个实体类的class和两个join用的字段名称作为参数。在上面这个例子中，只传入的Address的字段作为参数，因为默认情况下是使用主键作为Join左侧的字段名称。
+#### QueryBuild中的Join方法
+因为在使用主键作为join参数的时候是可以省略的，所以join存在了三个重载的方法。
+```java
+/**
+  * Expands the query to another entity type by using a JOIN.
+  * The primary key property of the primary entity for
+  * this QueryBuilder is used to match the given destinationProperty.
+  */
+public <J> Join<T, J> join(Class<J> destinationEntityClass, Property destinationProperty)
+ 
+/**
+ * Expands the query to another entity type by using a JOIN.
+ * The given sourceProperty is used to match the primary
+ * key property of the given destinationEntity.
+ */
+public <J> Join<T, J> join(Property sourceProperty, Class<J> destinationEntityClass)
+ 
+/**
+ * Expands the query to another entity type by using a JOIN.
+ * The given sourceProperty is used to match the given
+ * destinationProperty of the given destinationEntity.
+ */
+public <J> Join<T, J> join(Property sourceProperty, Class<J> destinationEntityClass,
+    Property destinationProperty)
+```
+#### 多表联查
+greendao允许链式的调用join来实现多张表的联查。可以在使用join的时候调用另外一个关联了表的join。这样第一个join的第二张表则作为第二join的第一张表来进行关联。
+QueryBuilder的API是这样的
+```java
+/**
+ * Expands the query to another entity type by using a JOIN.
+ * The given sourceJoin's property is used to match the
+ * given destinationProperty of the given destinationEntity.
+ * Note that destination entity of the given join is used
+ * as the source for the new join to add. In this way,
+ * it is possible to compose complex "join of joins" across
+ * several entities if required.
+ */
+public <J> Join<T, J> join(Join<?, T> sourceJoin, Property sourceProperty,
+    Class<J> destinationEntityClass, Property destinationProperty)
+```
+下面是一个关联了三张表的例子：City, Country, Continent。如果要查询欧洲中人口最少一百万的City：
+```java
+QueryBuilder qb = cityDao.queryBuilder().where(Properties.Population.ge(1000000));
+Join country = qb.join(Properties.CountryId, Country.class);
+Join continent = qb.join(country, CountryDao.Properties.ContinentId,
+  Continent.class, ContinentDao.Properties.Id);
+continent.where(ContinentDao.Properties.Name.eq("Europe"));
+List<City> bigEuropeanCities = qb.list();
+```
+#### 联查本表/树形结构
+join操作同时也可以用来关联单个实体类，例如我们要查询所有爷爷名称是“Lincoln”的Person。假设在Person表中有一个fatherId字段来指向同一张表中的某一个Person，查询可以这样写
+```java
+QueryBuilder qb = personDao.queryBuilder();
+Join father = qb.join(Person.class, Properties.FatherId);
+Join grandfather = qb.join(father, Properties.FatherId, Person.class, Properties.Id);
+grandfather.where(Properties.Name.eq("Lincoln"));
+List<Person> lincolnDescendants = qb.list();
+```
+正如上面看到的，join是一个非常强大的用来多表联查的方法。
+
+### 数据库加密
+greendao支持对一些含有敏感数据的数据库进行加密。
+虽然新版本的Android系统支持文件系统加密，但是Android本身并没有提供对数据库文件的加密支持。所以如果攻击者拿到了对数据库文件的访问权限（比如里用安全漏洞或欺骗root设备的用户拿到root权限），那么攻击者就可以访问数据库文件中的所有数据。使用加密的数据库能带来额外的一层安全防护，防止攻击者直接读取数据库文件。
+**使用自定义的SQLite构建器**
+因为Android本身并不支持加密数据库，所以需要在apk中带上一个自定义的SQLite构建器。这个自定义的构建器包含了native代码，所以APK体积会增大几兆。
+**设置加密数据库**
+greendao支持SQLCipher对数据库进行加密。 SQLCipher是一个第三方的数据库构建器，使用256-bitAES加密。
+**添加SQLCipher依赖**
+```
+compile 'net.zetetic:android-database-sqlcipher:3.5.4@aar'
+```
+**数据库初始化**
+只需要在创建数据库的时候使用.getEncryptedWritableDb(<password>)来代替.getWritableDb()就可以了。
+最终代码如下：
+```java
+DevOpenHelper helper = new DevOpenHelper(this, "notes-db-encrypted.db");
+Database db = helper.getEncryptedWritableDb("<your-secret-password>");
+daoSession = new DaoMaster(db).newSession();
+```
 
 ### 附
 本文内容依据于官方文档，部分为GreenDao官方文档直译。
