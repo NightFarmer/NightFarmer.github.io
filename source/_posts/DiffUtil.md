@@ -6,11 +6,11 @@ category: Android
 ---
 
 自从Google提供了RecyclerView之后，这个控件在Android列表和表格的开发中越来越多的替代了ListView和GridView，而且RecyclerView额外的提供了一些旧控件所没有的行为，比如局部刷新、列表表格更新动画、元素拖拽等等，极大程度的简化和方便了集合数据的展示UI的开发。
-而在使用RecyclerView进行一些局部刷新时，往往会手动记录集合元素的增、删、变更、移动等事件，并分别调用不同的方法来通知adapter来对控件进行更新。而本篇介绍的工具类则对这些操作进行了完美的封装，让我们不再需要手动计算并记录元素的变更，而是交由DiffUtil来计算新旧数据集合的差异并自动通知adapter来通过不同的更新方法来进行UI。
+而在使用RecyclerView进行一些局部刷新时，往往会手动记录集合元素的增、删、变更、移动等事件，并分别调用不同的方法来通知adapter来对控件进行更新。而本篇介绍的工具类则对这些操作进行了完美的封装，让我们不再需要手动计算并记录元素的变更，而是交由DiffUtil来计算新旧数据集合的差异并通知adapter调用不同的更新方法来更新UI。
 ![排序](http://nightfarmer.github.io/public/static/image/diffutil1.gif)  ![局部刷新](http://nightfarmer.github.io/public/static/image/diffutil2.gif)
 <!-- more -->
 
-#### 基本用法
+#### 基本用法 
 在已经使用了RecyclerView的项目中使用DiffUtil非常简单
 ```java
 DiffResult diffResult = DiffUtil.calculateDiff(new MyCallBack(oldList, newList));
