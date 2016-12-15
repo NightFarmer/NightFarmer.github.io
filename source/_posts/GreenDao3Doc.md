@@ -734,11 +734,14 @@ daoSession = new DaoMaster(db).newSession();
 上文提到greendao的实体类注解只能使用java类，所以kotlin项目中的实体类需要用java类定义。
 而在实际开发中会发现，kotlin的编译插件识别不到greendao插件生成的代码，而造成编译时提示找不到Dao、Session等类。
 可以通过在build文件中加入如下配置解决此问题
-```groovy
+```
+android{
+    ...
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
         main.java.srcDirs += 'build/generated/source/greendao'
     }
+}
 ```
 ### 附
 本文内容依据于官方文档，部分为GreenDao官方文档直译。
