@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>NightFarmer&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="NightFarmer's Blog">
+<meta property="og:url" content="http://nightfarmer.github.io/index.html">
+<meta property="og:site_name" content="NightFarmer's Blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NightFarmer's Blog">
+  
+    <link rel="alternative" href="/atom.xml" title="NightFarmer&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+    
+    
+  
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: true,
+          isPost: false,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false,
+      }
+  </script>
+
+  
+      <script>
+          yiliaConfig.rootUrl = "/";
+      </script>
+  
+
+  
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn js-avatar">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">NightFarmer</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">理论指导实践，实践深化理论</p>
+        
+                
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <li id="Email"><a class="Email" target="_blank" href="mailto:494090597@qq.com" title="Email"></a></li>
+                            
+                                <li id="新浪微博"><a class="新浪微博" target="_blank" href="http://weibo.com/NightFarmer" title="新浪微博"></a></li>
+                            
+                                <li id="GitHub"><a class="GitHub" target="_blank" href="https://github.com/NightFarmer" title="GitHub"></a></li>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/AS/" style="font-size: 11.43px;">AS</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Android架构/" style="font-size: 10px;">Android架构</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Bezier曲线/" style="font-size: 10px;">Bezier曲线</a> <a href="/tags/Doc/" style="font-size: 10px;">Doc</a> <a href="/tags/EventBus/" style="font-size: 10px;">EventBus</a> <a href="/tags/File/" style="font-size: 10px;">File</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.86px;">JavaScript</a> <a href="/tags/Kotlin/" style="font-size: 12.86px;">Kotlin</a> <a href="/tags/Lua/" style="font-size: 10px;">Lua</a> <a href="/tags/NDK/" style="font-size: 10px;">NDK</a> <a href="/tags/ReactNative/" style="font-size: 11.43px;">ReactNative</a> <a href="/tags/RecyclerView/" style="font-size: 18.57px;">RecyclerView</a> <a href="/tags/RxAndroid/" style="font-size: 11.43px;">RxAndroid</a> <a href="/tags/RxJava/" style="font-size: 11.43px;">RxJava</a> <a href="/tags/ViewPager/" style="font-size: 10px;">ViewPager</a> <a href="/tags/cocos/" style="font-size: 10px;">cocos</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/okhttp/" style="font-size: 11.43px;">okhttp</a> <a href="/tags/orm/" style="font-size: 10px;">orm</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/列表动画/" style="font-size: 14.29px;">列表动画</a> <a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a> <a href="/tags/动画/" style="font-size: 15.71px;">动画</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/干货/" style="font-size: 17.14px;">干货</a> <a href="/tags/数据存储/" style="font-size: 10px;">数据存储</a> <a href="/tags/数据库/" style="font-size: 10px;">数据库</a> <a href="/tags/热更新/" style="font-size: 10px;">热更新</a> <a href="/tags/特效/" style="font-size: 10px;">特效</a> <a href="/tags/自定义控件/" style="font-size: 17.14px;">自定义控件</a> <a href="/tags/适配/" style="font-size: 10px;">适配</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://git.oschina.net/">Git@OSC</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我就是我 是颜色不一样的烟火</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">NightFarmer</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">NightFarmer</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">理论指导实践，实践深化理论</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <li id="Email"><a class="Email" target="_blank" href="mailto:494090597@qq.com" title="Email"></a></li>
+                            
+                                <li id="新浪微博"><a class="新浪微博" target="_blank" href="http://weibo.com/NightFarmer" title="新浪微博"></a></li>
+                            
+                                <li id="GitHub"><a class="GitHub" target="_blank" href="https://github.com/NightFarmer" title="GitHub"></a></li>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap">
+  
+    <article id="post-RnMobX" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/02/14/RnMobX/" class="article-date">
+      <time datetime="2017-02-14T01:11:30.000Z" itemprop="datePublished">2017-02-14</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/02/14/RnMobX/">在ReactNative中使用MobX框架管理State实现ListView的局部刷新</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <p>在ReactNative中UI的刷新大多数情况依赖于state的变更，通过调用组件的setState方法来更新state以达到通知组件重新渲染UI的目的。当然这种做法是官方提供的标准解决方案，在进行简单UI设计时足以满足大多数需求。<br>但是当遇到结构复杂并存在数据交互的界面设计时，手动管理state这种做法则会把代码逻辑变得非常混乱，组件内不但要负责UI的渲染，还要兼顾state的变更以及不同组件间数据的传递和同步。当项目遇到这种时，引入一个状态管理框架则显得尤为重要。<br>本篇则着重以一个List的数据展示及更新的例子来展开，记录如何在ReactNative中使用<code>MobX</code>框架来代替手动管理state更新Ui，以及如何实现最小粒度的界面渲染。<br>下面两图分别是不做任何处理的全局更新列表数据和使用<code>MobX</code>框架局部更新列表数据的运行效果，可以看到在使用<code>MobX</code>框架在更新行数据时只会重新渲染当前行的组件，而全局更新则会将ListView中的所有ItemView全部渲染一次，同时在实际操作中也会感到明细的卡顿。<br><img src="http://nightfarmer.github.io/public/static/image/rnListRefresh.gif" alt="image"> <img src="http://nightfarmer.github.io/public/static/image/mobxListRefresh.gif" alt="image"><br>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/ReactNative/">ReactNative</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ReactNative/">ReactNative</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a  href="/2017/02/14/RnMobX/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+  
+    <article id="post-DiffUtil" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/12/02/DiffUtil/" class="article-date">
+      <time datetime="2016-12-02T06:40:37.000Z" itemprop="datePublished">2016-12-02</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/12/02/DiffUtil/">Android7.0新增工具DiffUtil详解</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <p>自从Google提供了RecyclerView之后，这个控件在Android列表和表格的开发中越来越多的替代了ListView和GridView，而且RecyclerView额外的提供了一些旧控件所没有的行为，比如局部刷新、列表表格更新动画、元素拖拽等等，极大程度的简化和方便了集合数据的展示UI的开发。<br>而在使用RecyclerView进行一些局部刷新时，往往会手动记录集合元素的增、删、变更、移动等事件，并分别调用不同的方法来通知adapter来对控件进行更新。而本篇介绍的工具类则对这些操作进行了完美的封装，让我们不再需要手动计算并记录元素的变更，而是交由DiffUtil来计算新旧数据集合的差异并通知adapter调用不同的更新方法来更新UI。<br><img src="http://nightfarmer.github.io/public/static/image/diffutil1.gif" alt="排序">  <img src="http://nightfarmer.github.io/public/static/image/diffutil2.gif" alt="局部刷新"><br>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RecyclerView/">RecyclerView</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a  href="/2016/12/02/DiffUtil/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+  
+    <article id="post-GPSUtil" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/12/01/GPSUtil/" class="article-date">
+      <time datetime="2016-12-01T02:26:23.000Z" itemprop="datePublished">2016-12-01</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/12/01/GPSUtil/">WGS84、GCJ02、BD09地图坐标系间的坐标转换及坐标距离计算</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <p>在开发中用到定位和地图功能的都会知道位置信息会有多个坐标系来表示，而不同地图厂商使用的坐标系也可能是不一样的，web、Android以及iOS可能使用了不同厂家的地图，这就出现了在不同坐标系间转换坐标的需求。<br>然而一些地图SDK给出的地图坐标转换接口的实现是在服务器进行的，那么这些接口的调用不但会发起网络请求而效率上也会非常的慢，无论是对于客户端离线操作还是在自己的服务后台批量转换坐标数据，都需要本地实现坐标转换的算法来满足快速运算的需求。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">坐标系</th>
+<th style="text-align:left">解释</th>
+<th style="text-align:left">使用地图</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">WGS84</td>
+<td style="text-align:left"><strong>地球坐标系</strong>，国际上通用的坐标系。设备一般包含GPS芯片或者北斗芯片获取的经纬度为WGS84地理坐标系,最基础的坐标，谷歌地图在非中国地区使用的坐标系</td>
+<td style="text-align:left">GPS/谷歌地图卫星</td>
+</tr>
+<tr>
+<td style="text-align:left">GCJ02</td>
+<td style="text-align:left"><strong>火星坐标系</strong>，是由中国国家测绘局制订的地理信息系统的坐标系统。并要求在中国使用的地图产品使用的都必须是加密后的坐标，而这套WGS84加密后的坐标就是gcj02。</td>
+<td style="text-align:left">腾讯(搜搜)地图，阿里云地图，高德地图，谷歌国内地图</td>
+</tr>
+<tr>
+<td style="text-align:left">BD09</td>
+<td style="text-align:left"><strong>百度坐标系</strong>，百度在GCJ02的基础上进行了二次加密，官方解释是为了进一步保护用户隐私</td>
+<td style="text-align:left">百度地图</td>
+</tr>
+<tr>
+<td style="text-align:left">小众坐标系</td>
+<td style="text-align:left">类似于百度地图，在GCJ02基础上使用自己的加密算法进行二次加密的坐标系</td>
+<td style="text-align:left">搜狗地图、图吧地图 等</td>
+</tr>
+</tbody>
+</table>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/干货/">干货</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a  href="/2016/12/01/GPSUtil/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+  
+    <article id="post-GreenDao3Doc" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/11/21/GreenDao3Doc/" class="article-date">
+      <time datetime="2016-11-21T01:44:55.000Z" itemprop="datePublished">2016-11-21</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/11/21/GreenDao3Doc/">SQLite数据库Orm框架GreenDao3使用详解</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <p>Android平台能够使用的数据库无非SQLite和Realm两种，Realm是第三方的响应式移动平台数据库，而SQLite则是Android原生支持的文件数据库。<br>今天要记录的是SQLite数据库的Orm框架GreenDao3，和EventBus出自同一开源组织，来自于greenrobot。<br>GreenDao3相对于GreenDao2使用起来更加便捷，是不可多得的兼效率和便捷于一身的SQLite Orm框架。<br><img src="http://greenrobot.org/wordpress/wp-content/uploads/greenDAO-orm-640.png" alt="GreenDao架构图"></p>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/orm/">orm</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/数据库/">数据库</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a  href="/2016/11/21/GreenDao3Doc/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+  
+    <article id="post-MediaPlayer" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/11/17/MediaPlayer/" class="article-date">
+      <time datetime="2016-11-17T07:11:44.000Z" itemprop="datePublished">2016-11-17</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/11/17/MediaPlayer/">使用MediaPlayer开发简单的在线音乐播放器</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <p>由于工作内容的局限性，Service组件在平时并不经常用得上，本篇以一个简单的音乐播放器为例，记录开发过程，以熟悉Service组件的使用，以免生疏。<br>本篇中所用到的音乐数据及音乐播放地址皆以爬虫实时获取，只用于学习交流所用。</p>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/干货/">干货</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a  href="/2016/11/17/MediaPlayer/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+  
+    <article id="post-StethoSummary" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/11/17/StethoSummary/" class="article-date">
+      <time datetime="2016-11-17T02:48:57.000Z" itemprop="datePublished">2016-11-17</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/11/17/StethoSummary/">使用来自Facebook的调试神器Stetho对Android应用程序进行调试</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <p>UI、网络交互以及本地数据存储在当前的手机应用程序开发中已经是不可缺少的三个元素了，然而如何在开发过程中快速调试这三个元素则成为提高开发效率的必然途径。<br>在不是用任何辅助工具的情况下，我们罗列一下这三个元素的的普通调试方式：<br><strong>UI</strong>：若是静态的UI我们只需在在AS中实时预览即可，而如果是动态UI，比如代码生成或者根据用户操作实时生成这些情况，我们则不能比较直观的查看到UI的层次结构。<br><strong>网络交互</strong>：若是简单的监听返回数据，我们或许可以通过Log打印出来，简单的GET请求也可以在浏览器上输入URL进行测试，但是遇见参数复杂或者数量庞大的网络请求的情况下，上述两种方式都不能优雅的解决我们的问题。<br><strong>本地数据</strong>：Android的本地数据包括数据库和SharedPreference（SP），查看数据库数据无非两种方式，一种是使用Android平台的查看工具进行查看，第二种这是把sql文件拷贝到电脑上使用工具进行查看，而数据库数据变更后我们则需要再次拷贝一份。而SP的数据除了查看对应的xml文件，则只能通过写一份工具代码来遍历查看了。</p>
+<blockquote>
+<blockquote>
+<p>如果你的开发效率卡在上面这些瓶颈上，那么Stetho则是解决这个问题的“银弹”。</p>
+</blockquote>
+</blockquote>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/干货/">干货</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a  href="/2016/11/17/StethoSummary/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+  
+    <article id="post-InitWinEnv" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/09/30/InitWinEnv/" class="article-date">
+      <time datetime="2016-09-30T05:28:59.000Z" itemprop="datePublished">2016-09-30</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/09/30/InitWinEnv/">使用Chocolatey包管理器一键搭建windows开发环境</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <p>最近腾讯开放内测的微信小程序火了，而官方支持IDE只有windows版和Mac版的，稍微研究了一下这个IDE发现是node-webkit开发的，理论上应该是跨平台的，但不知为何这个IDE并没有支持Linux环境。喜欢折腾的我当然是要尝试一下的，奈何是使用Ubuntu作为主力开发环境，所以只能重做一个windows系统了。<br>话说回来，重装系统之后最大的问题就是开发环境需要配置，比如JDK、各种IDE、python、nodejs、tomcat、mysql、以及各种小工具等等，而把一个新系统配置到能正常进行开发工作基本上要耗费半天时间，时间就是生命，怎能这样无情的浪费。<br>Chocolatey是一个类似于linux中apt-get和yum这样的工具，通过他可以自动获取到需要软件的下载地址以及安装脚本已完成自动安装，而本篇则记录如何使用Chocolatey来通过脚本文件实现一键搭建开发环境，就像这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">initWineEnv.bat</div></pre></td></tr></table></figure></p>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/其他/">其他</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/干货/">干货</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a  href="/2016/09/30/InitWinEnv/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+  
+    <article id="post-AutoBuildApk" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/09/22/AutoBuildApk/" class="article-date">
+      <time datetime="2016-09-22T08:16:15.000Z" itemprop="datePublished">2016-09-22</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/09/22/AutoBuildApk/">Linux开发环境中使用shell/python脚本快速自动打包并查看apk文件</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <p>最近工作中突然遇到一个很烦人的问题, 事情的起因是这样的. 我参与开发/维护着大概5个项目, 负责服务端后台的同事经常在自己的本地电脑启着本地服务测试一些东西, 而他们的本地局域网IP是经常变动的, 那么问题来了, 只要他们的IP地址变动了就会过来找我针对某个局域网IP地址为某个项目打个包, 烦不胜烦. 甚至有些情况下需要两项目同时开发, AndroidStudio需要连着开好几个, 但是电脑受不了啊, 而且AndroidStudio有一个非常不友好的地方: 如果开启多个AndroidStudio工程, 只要某一个窗口卡了, 那么其余的工程界面也全都是无响应状态的. 当这两个问题重叠到一起的时候, 好了, 可用把鼠标和键盘放一边慢慢等着打包吧, 完了才能继续快乐的编程. 这简直不能忍.<br>今天针对这个问题, 记录一种解决方法, 实现在不打开AndroidStudio的情况下自动打包, 指定version/ip地址等, 并在打包完成后显示签名信息以及apk详细信息且打开apk所在文件夹.<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python buildapk.py -i 192.168.x.x -v 1.2.3</div></pre></td></tr></table></figure></p>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/干货/">干货</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a  href="/2016/09/22/AutoBuildApk/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+  
+    <article id="post-InterpolatorPreview" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/09/12/InterpolatorPreview/" class="article-date">
+      <time datetime="2016-09-12T10:15:54.000Z" itemprop="datePublished">2016-09-12</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/09/12/InterpolatorPreview/">自定义view展示官方Interpolator并扩展自定义Interpolator</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <p>现在动画在Android开发中使用得越来越频繁, 一个新发布的app如果没有一点酷炫的效果还真拿不出手, 然而说到动画必然会联系到动画差值器Interpolator, 这是一个让动画执行起来不会闲的突兀或者平淡乏味的东西, 有了它我们的动画会显得更加生动和具有物理特性.<br>而实际开发过程中如果需要某个差值器的情况下, 一般是找一些曲线图片然后依靠想象挑选或者直接挨个尝试来得到最合适的, 这些做法虽然可行但终究还是比较麻烦, 说直白点就是比较low, 而且在官方提供的差值器不满足我们的需求的时候, 我们需要开发自己的差值器, 在这种情况下就更需要一种非常直接的方法来展示差值器的效果了.<br>本篇则基于这样的需求驱动, 自定义了View来展示曲线以及差值器的执行效果, 把官方所有的差值器都放进去跑起来, 当需要的时候直接挑选即可. 而自定义的Interpolator也可用来测试以及查看差值曲线.<br>图:<br><img src="http://nightfarmer.github.io/public/static/image/InterpolatorDemo1.gif" alt="Interpolator示例1"> <img src="http://nightfarmer.github.io/public/static/image/InterpolatorDemo2.gif" alt="Interpolator示例1"> <img src="http://nightfarmer.github.io/public/static/image/InterpolatorDemo3.gif" alt="Interpolator示例1"><br>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/动画/">动画</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a  href="/2016/09/12/InterpolatorPreview/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+  
+    <article id="post-ScriptIntrinsicBlur" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/09/09/ScriptIntrinsicBlur/" class="article-date">
+      <time datetime="2016-09-09T07:58:15.000Z" itemprop="datePublished">2016-09-09</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/09/09/ScriptIntrinsicBlur/">使用v8兼容包对图片进行高斯模糊处理/毛玻璃效果</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <p>android中实现毛玻璃效果的方法比较多, 有用java实现图片处理算法的, 也有把算法用c/c++实现并用jni调用的, 而实现毛玻璃的开源库在github上也有不少.<br>其实google的官方sdk中也为我们提供了这样的工具, 本着能用官方尽量不自己实现,能自己实现尽量不用第三方的原则, 官方的实现方式当然是要尝试一下的.<br>同时, 本例中的拖拽进度和图片的处理以及回显是通过RxJava放在不同的进程中处理的, 如果不熟悉Rx框架可以补一下, RxJava用于异步操作以及事件流的处理非常好用.<br>上图:<br><img src="http://nightfarmer.github.io/public/static/image/BlurDemo.gif" alt="高斯模糊示例"><br>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RxAndroid/">RxAndroid</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/特效/">特效</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a  href="/2016/09/09/ScriptIntrinsicBlur/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+  
+  
+    <nav id="page-nav">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    </nav>
+  
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2017 NightFarmer
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme Yelee by MOxFIVE
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >本站到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

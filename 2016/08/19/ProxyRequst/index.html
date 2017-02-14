@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>使用动态代理对网络请求接口进行面向对象封装 | NightFarmer&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在android中常规的网络请求方式是把URL地址作为常量放在某个固定的类中，比如定义一个URLConstant，里面定义URL1/URL2/URL3等等，在使用的时候使用URLConstant.URL1这样的形式来获取真实的网络地址。而每一个网络接口的参数列表则是放在另外一个类或者临时赋值，在这样的设计情况下，在网络接口达到一定量的时候会出现一个URL地址找不到对应的参数列表的困扰，因为太多了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用动态代理对网络请求接口进行面向对象封装">
+<meta property="og:url" content="http://nightfarmer.github.io/2016/08/19/ProxyRequst/index.html">
+<meta property="og:site_name" content="NightFarmer's Blog">
+<meta property="og:description" content="在android中常规的网络请求方式是把URL地址作为常量放在某个固定的类中，比如定义一个URLConstant，里面定义URL1/URL2/URL3等等，在使用的时候使用URLConstant.URL1这样的形式来获取真实的网络地址。而每一个网络接口的参数列表则是放在另外一个类或者临时赋值，在这样的设计情况下，在网络接口达到一定量的时候会出现一个URL地址找不到对应的参数列表的困扰，因为太多了。">
+<meta property="og:updated_time" content="2017-02-14T01:08:44.980Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用动态代理对网络请求接口进行面向对象封装">
+<meta name="twitter:description" content="在android中常规的网络请求方式是把URL地址作为常量放在某个固定的类中，比如定义一个URLConstant，里面定义URL1/URL2/URL3等等，在使用的时候使用URLConstant.URL1这样的形式来获取真实的网络地址。而每一个网络接口的参数列表则是放在另外一个类或者临时赋值，在这样的设计情况下，在网络接口达到一定量的时候会出现一个URL地址找不到对应的参数列表的困扰，因为太多了。">
+  
+    <link rel="alternative" href="/atom.xml" title="NightFarmer&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false,
+      }
+  </script>
+
+  
+      <script>
+          yiliaConfig.rootUrl = "/";
+      </script>
+  
+
+  
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn js-avatar">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">NightFarmer</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">理论指导实践，实践深化理论</p>
+        
+                
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <li id="Email"><a class="Email" target="_blank" href="mailto:494090597@qq.com" title="Email"></a></li>
+                            
+                                <li id="新浪微博"><a class="新浪微博" target="_blank" href="http://weibo.com/NightFarmer" title="新浪微博"></a></li>
+                            
+                                <li id="GitHub"><a class="GitHub" target="_blank" href="https://github.com/NightFarmer" title="GitHub"></a></li>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/AS/" style="font-size: 11.43px;">AS</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Android架构/" style="font-size: 10px;">Android架构</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Bezier曲线/" style="font-size: 10px;">Bezier曲线</a> <a href="/tags/Doc/" style="font-size: 10px;">Doc</a> <a href="/tags/EventBus/" style="font-size: 10px;">EventBus</a> <a href="/tags/File/" style="font-size: 10px;">File</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.86px;">JavaScript</a> <a href="/tags/Kotlin/" style="font-size: 12.86px;">Kotlin</a> <a href="/tags/Lua/" style="font-size: 10px;">Lua</a> <a href="/tags/NDK/" style="font-size: 10px;">NDK</a> <a href="/tags/ReactNative/" style="font-size: 11.43px;">ReactNative</a> <a href="/tags/RecyclerView/" style="font-size: 18.57px;">RecyclerView</a> <a href="/tags/RxAndroid/" style="font-size: 11.43px;">RxAndroid</a> <a href="/tags/RxJava/" style="font-size: 11.43px;">RxJava</a> <a href="/tags/ViewPager/" style="font-size: 10px;">ViewPager</a> <a href="/tags/cocos/" style="font-size: 10px;">cocos</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/okhttp/" style="font-size: 11.43px;">okhttp</a> <a href="/tags/orm/" style="font-size: 10px;">orm</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/列表动画/" style="font-size: 14.29px;">列表动画</a> <a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a> <a href="/tags/动画/" style="font-size: 15.71px;">动画</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/干货/" style="font-size: 17.14px;">干货</a> <a href="/tags/数据存储/" style="font-size: 10px;">数据存储</a> <a href="/tags/数据库/" style="font-size: 10px;">数据库</a> <a href="/tags/热更新/" style="font-size: 10px;">热更新</a> <a href="/tags/特效/" style="font-size: 10px;">特效</a> <a href="/tags/自定义控件/" style="font-size: 17.14px;">自定义控件</a> <a href="/tags/适配/" style="font-size: 10px;">适配</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://git.oschina.net/">Git@OSC</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我就是我 是颜色不一样的烟火</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">NightFarmer</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">NightFarmer</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">理论指导实践，实践深化理论</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <li id="Email"><a class="Email" target="_blank" href="mailto:494090597@qq.com" title="Email"></a></li>
+                            
+                                <li id="新浪微博"><a class="新浪微博" target="_blank" href="http://weibo.com/NightFarmer" title="新浪微博"></a></li>
+                            
+                                <li id="GitHub"><a class="GitHub" target="_blank" href="https://github.com/NightFarmer" title="GitHub"></a></li>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-ProxyRequst" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/08/19/ProxyRequst/" class="article-date">
+      <time datetime="2016-08-19T04:58:03.000Z" itemprop="datePublished">2016-08-19</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      使用动态代理对网络请求接口进行面向对象封装
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Java/">Java</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/动态代理/">动态代理</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>在android中常规的网络请求方式是把URL地址作为常量放在某个固定的类中，比如定义一个URLConstant，里面定义URL1/URL2/URL3等等，在使用的时候使用URLConstant.URL1这样的形式来获取真实的网络地址。而每一个网络接口的参数列表则是放在另外一个类或者临时赋值，在这样的设计情况下，在网络接口达到一定量的时候会出现一个URL地址找不到对应的参数列表的困扰，因为太多了。<br>或许在真实实践中可以通过注释或者规范的命名来规避这个问题，但是我们仍然需要考虑有没有一种更好的解决方案呢？比如这样来调用：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//调用：</span></div><div class="line">IPersonServer iPersonServer = ServerBuilder.build(<span class="keyword">this</span>, IPersonServer.class);</div><div class="line">Person person = iPersonServer.getPersonById(<span class="string">"003"</span>);</div><div class="line"><span class="comment">//定义：</span></div><div class="line"><span class="meta">@Intf</span>(<span class="string">"/persons"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IPersonServer</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Request</span>(<span class="string">"/get"</span>)</div><div class="line">    <span class="function">Person <span class="title">getPersonById</span><span class="params">(@Param(<span class="string">"personId"</span>)</span> String id)</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>看起来是不是非常清爽，我们请求一些数据的时候只需要调用相应的java接口以及方法即可，而不用关心这个网络接口需要哪些参数，因为这个java接口已经帮我们约束了，那么接下来我们就记录一下如何实现网络请求的面向对象封装。</p>
+<a id="more"></a>
+<p>上面示例中的接口的实际请求地址是<a href="http://127.0.0.1:8080/persons/get" target="_blank" rel="external">http://127.0.0.1:8080/persons/get</a> ，参数列表为personId=003<br>要达到这个目的我们需要解析接口注解中的的参数，我们首先为interface、function、param分别定义注解<br>接口注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</div><div class="line"><span class="meta">@Target</span>(ElementType.TYPE)</div><div class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Intf &#123;</div><div class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>方法注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</div><div class="line"><span class="meta">@Target</span>(ElementType.METHOD)</div><div class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Request &#123;</div><div class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>参数注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</div><div class="line"><span class="meta">@Target</span>(ElementType.PARAMETER)</div><div class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Param &#123;</div><div class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这时候我们就可以定义实例中的那种形式的接口了，但是我们要如何实现java接口和网络接口的转换呢？<br>动态代理是个非常不错的方法，直接上代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServerBuilder</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String URLHost = <span class="string">"http://127.0.0.1:8080"</span>;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">build</span><span class="params">(Context context, <span class="keyword">final</span> Class&lt;T&gt; serverCls)</span> </span>&#123;</div><div class="line">        Object proxyInstance = Proxy.newProxyInstance(context.getClassLoader(), <span class="keyword">new</span> Class[]&#123;serverCls&#125;, <span class="keyword">new</span> InvocationHandler() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</div><div class="line">                String URL = URLHost;</div><div class="line">                Intf annoIntf = serverCls.getAnnotation(Intf.class);</div><div class="line">                URL += annoIntf.value();</div><div class="line">                Request annoRequest = method.getAnnotation(Request.class);</div><div class="line">                URL += annoRequest.value();</div><div class="line">                Annotation[][] parameterAnnotations = method.getParameterAnnotations();</div><div class="line">                Map&lt;String, Object&gt; paramMap = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; parameterAnnotations.length; i++) &#123;</div><div class="line">                    Annotation[] parameterAnnotation = parameterAnnotations[i];</div><div class="line">                    <span class="keyword">for</span> (Annotation annoParam : parameterAnnotation) &#123;</div><div class="line">                        <span class="keyword">if</span> (annoParam <span class="keyword">instanceof</span> Param) &#123;</div><div class="line">                            String key = ((Param) annoParam).value();</div><div class="line">                            paramMap.put(key, args[i]);</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">                Log.i(<span class="string">"ProxyTest"</span>, <span class="string">"网络请求地址："</span> + URL);</div><div class="line">                Log.i(<span class="string">"ProxyTest"</span>, <span class="string">"网络请求参数："</span> + paramMap);</div><div class="line">                <span class="comment">// <span class="doctag">TODO:</span> 网络请求，并将返回值反序列化为object返回</span></div><div class="line">                <span class="comment">//模拟返回值对象</span></div><div class="line">                Person person = <span class="keyword">new</span> Person();</div><div class="line">                person.id = <span class="string">"003"</span>;</div><div class="line">                person.name = <span class="string">"张三"</span>;</div><div class="line">                <span class="keyword">return</span> person;</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">        <span class="keyword">return</span> (T) proxyInstance;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>为了让流程看起来更加请清晰，上列代码中暂时把Annotation的非空判断去掉了。<br>这个方法中传入了context和接口的Class对象，返回了一个接口的动态代理对象。<br>首先根据传入方法的Class对象获取接口的注解中所定义的url路径，当代理对象的方法被调用时，Method对象会被传入invoke回调中，接着获取method的注解中所定义的url，接着把这两个url和Host地址进行拼接即可得到我们需要的真实的URL<br>在代理回调方法中的第三个参数是方法的参数列表，这是一个Object数组，并不会把参数的定义名称传进来，在对代码进行混淆之后的class文件中也并不会存储参数名，所以这里们定义了Param注解来指定Url需要参数名，Method的getParameterAnnotations方法会Annotation的二纬数组，这个二纬数组描述了方法的<strong>全部</strong>参数上所定义的<strong>全部</strong>注解，而这个有序的数组是和参数列表是一一对应的。那么我们就可用从这个参数注解的二维数组中拿到我们想要的数据了，把从注解中拿到的参数的名称和值放入一个hashmap中以供网络请求使用。</p>
+<p>鉴于本篇只是描述如何使用动态代理封装URL，网络请求的实现和返回值的反序列化就不在这里赘述，这里使用一个Person对象来模拟返回值；</p>
+<p>运行结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">I/ProxyTest: 网络请求地址：http://127.0.0.1:8080/persons/get</div><div class="line">I/ProxyTest: 网络请求参数：&#123;personId=003&#125;</div><div class="line">I/ProxyTest: 获得动态代理接口返回值：Person对象：&#123;id:003, name:张三&#125;</div></pre></td></tr></table></figure></p>
+<p>这样的实现方式在互联网上也是存在的，比如现在比较火的Retrofit，和RxJava一起使用效果更佳。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2016/08/23/BezierDrawer/">
+                    做一个二阶Bezier曲线的绘图工具
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2016/08/10/luabridge/">
+                    有关Android热更新/热补丁的一种新的解决方案
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+
+
+
+    <div class="share">
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+    <a href="#" class="bds_copy" data-cmd="copy" title="复制网址"></a>
+    <a href="#" class="bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+    </div>
+    <script>
+        window._bd_share_config={
+            "common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+</div>
+
+
+
+    
+      <div class="duoshuo" id="comments">
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="2016/08/19/ProxyRequst/" data-title="使用动态代理对网络请求接口进行面向对象封装" data-url="http://nightfarmer.github.io/2016/08/19/ProxyRequst/"></div>
+    <!-- 多说评论框 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"nightfarmer"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://nightfarmer.github.io/js/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+</div>
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2016/08/23/BezierDrawer/" title="上一篇: 做一个二阶Bezier曲线的绘图工具">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2016/08/10/luabridge/" title="下一篇: 有关Android热更新/热补丁的一种新的解决方案">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/02/14/RnMobX/">在ReactNative中使用MobX框架管理State实现ListView的局部刷新</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/02/DiffUtil/">Android7.0新增工具DiffUtil详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/01/GPSUtil/">WGS84、GCJ02、BD09地图坐标系间的坐标转换及坐标距离计算</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/21/GreenDao3Doc/">SQLite数据库Orm框架GreenDao3使用详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/MediaPlayer/">使用MediaPlayer开发简单的在线音乐播放器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/StethoSummary/">使用来自Facebook的调试神器Stetho对Android应用程序进行调试</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/30/InitWinEnv/">使用Chocolatey包管理器一键搭建windows开发环境</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/22/AutoBuildApk/">Linux开发环境中使用shell/python脚本快速自动打包并查看apk文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/12/InterpolatorPreview/">自定义view展示官方Interpolator并扩展自定义Interpolator</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/09/ScriptIntrinsicBlur/">使用v8兼容包对图片进行高斯模糊处理/毛玻璃效果</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/07/ColorTheme/">给应用增加动态切换主题配色的功能</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/01/RxJavaFuncs/">RxJava常用操作符分类总汇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/31/RxJavaClick/">使用RxJava实现多次连续点击的事件监听</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/24/GoogleMVP/">浅析Google官方AndroidMVP架构示例</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/23/BezierDrawer/">做一个二阶Bezier曲线的绘图工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/19/ProxyRequst/">使用动态代理对网络请求接口进行面向对象封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/10/luabridge/">有关Android热更新/热补丁的一种新的解决方案</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/08/CircleWave/">通过自定义控件绘制实现雷达/水波纹的动画扩散效果</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/04/SatelliteButton/">设计一个通用的卫星菜单</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/03/make-a-wheel/">造一个“轮子”</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/29/make-a-home/">创建一个简单的android桌面APP</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/20/PageViewTab/">为ViewPager创建可自由设置高亮样式的TabBar</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/24/Recycler-Tree/">实现基于RecyclerView的树形组件封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/30/AS-SerialVersionUID/">AndroidStudio 自动生成 SerialVersionUID</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/30/AndroidLocalData/">android轻量级本地数据存储的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/25/ReactNative-libs/">ReactNative的一些参考资料以及第三方库</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/24/RecyAnim/">给滚动列表项增加渐显载入动画</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/17/Kotlin-anko/">使用Kotlin开发Android之anko扩展</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/13/EventBus/">通过EventBus实现android各组件间数据通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/12/Kotlin-yf/">使用Kotlin开发Android的常用技巧</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/25/Kotlin-android-EV/">AndroidStudio-Kotlin插件安装配置及工程配置调整</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/20/js-android/">使用JavaScript反射调用Android应用Native代码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/19/ExpandAnimList/">设计一个带有动画的可用展开/折叠的列表控件</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/16/JitpackUse/">发布自己的开源库到jitpack供gradle依赖调用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/14/listAnim1/">多种样式的列表item动画集合</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/BaseItemAnimator/">通过扩展ItemAnimator实现对Item的创建/移除动画进行抽象封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/RandomShowTextView/">实现一个随机字符显现/隐藏的TextView</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/ItemAnimator/">解析DefaultItemAnimator源码了解ItemAnimator动画处理器实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/12/MoneyInput/">android实现限制数值输入范围的金额EditText控制</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/01/View-onMeasure/">源码解析自定义View的onMeasure方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/15/OKHttpForm/">OKHttp3-多文件form表单形式上传的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/12/OKHttpDownload/">OKHttp3-扩展带有进度监听的下载回调</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/02/openFile/">调用Android设备中已经安装的软件打开各种类型的指定文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/24/AndroidPaintView/">自定义控件-使用Canvas绘图定义一个手写板</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/20/MakeSwitchButton/">自定义控件-定义一个开关按钮</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/23/Recycler-Grid/">使用RecyclerView实现Grid节点的拖拽排序</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/08/Recycler-pbl/">使用RecyclerView实现无限滚动瀑布流</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/03/RecyclerView/">RecyclerView的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/04/20/AS-HotKey/">AndroidStudio常用快捷键记录</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/11/AsyncDoc/">Async.js v2.0.0-pre官方文档翻译(未完成)</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/10/jsbind/">深入浅出 妙用JavaScript中apply、call、bind</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/06/makelianliankan1/">使用cocos2d引擎开发连连看的尝试</a></li><li class="post-list-item"><a class="post-list-link" href="/2014/03/07/AndroidScreenAdaptation/">Android屏幕分率适配</a></li><li class="post-list-item"><a class="post-list-link" href="/2014/03/01/HelloBlog/">Hello Blog</a></li></ul>
+    <script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2017 NightFarmer
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme Yelee by MOxFIVE
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >本站到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

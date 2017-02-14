@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>自定义控件-定义一个开关按钮 | NightFarmer&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本篇文章用于记录用于开放绘制BitMap相关的自定义控件Android应用程序中有一类自定义控件是由canvas绘制bitmap来构建视图，并通触摸事件或其方法来控制绘制视图的状态。本篇通过记录一个开关按钮的定义来熟悉此类自定义控件的开发流程。先看一下效果图：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自定义控件-定义一个开关按钮">
+<meta property="og:url" content="http://nightfarmer.github.io/2015/08/20/MakeSwitchButton/index.html">
+<meta property="og:site_name" content="NightFarmer's Blog">
+<meta property="og:description" content="本篇文章用于记录用于开放绘制BitMap相关的自定义控件Android应用程序中有一类自定义控件是由canvas绘制bitmap来构建视图，并通触摸事件或其方法来控制绘制视图的状态。本篇通过记录一个开关按钮的定义来熟悉此类自定义控件的开发流程。先看一下效果图：">
+<meta property="og:image" content="http://nightfarmer.github.io/public/static/image/switchButton.gif">
+<meta property="og:updated_time" content="2017-02-14T01:08:44.980Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自定义控件-定义一个开关按钮">
+<meta name="twitter:description" content="本篇文章用于记录用于开放绘制BitMap相关的自定义控件Android应用程序中有一类自定义控件是由canvas绘制bitmap来构建视图，并通触摸事件或其方法来控制绘制视图的状态。本篇通过记录一个开关按钮的定义来熟悉此类自定义控件的开发流程。先看一下效果图：">
+<meta name="twitter:image" content="http://nightfarmer.github.io/public/static/image/switchButton.gif">
+  
+    <link rel="alternative" href="/atom.xml" title="NightFarmer&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false,
+      }
+  </script>
+
+  
+      <script>
+          yiliaConfig.rootUrl = "/";
+      </script>
+  
+
+  
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn js-avatar">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">NightFarmer</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">理论指导实践，实践深化理论</p>
+        
+                
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <li id="Email"><a class="Email" target="_blank" href="mailto:494090597@qq.com" title="Email"></a></li>
+                            
+                                <li id="新浪微博"><a class="新浪微博" target="_blank" href="http://weibo.com/NightFarmer" title="新浪微博"></a></li>
+                            
+                                <li id="GitHub"><a class="GitHub" target="_blank" href="https://github.com/NightFarmer" title="GitHub"></a></li>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/AS/" style="font-size: 11.43px;">AS</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Android架构/" style="font-size: 10px;">Android架构</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Bezier曲线/" style="font-size: 10px;">Bezier曲线</a> <a href="/tags/Doc/" style="font-size: 10px;">Doc</a> <a href="/tags/EventBus/" style="font-size: 10px;">EventBus</a> <a href="/tags/File/" style="font-size: 10px;">File</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.86px;">JavaScript</a> <a href="/tags/Kotlin/" style="font-size: 12.86px;">Kotlin</a> <a href="/tags/Lua/" style="font-size: 10px;">Lua</a> <a href="/tags/NDK/" style="font-size: 10px;">NDK</a> <a href="/tags/ReactNative/" style="font-size: 11.43px;">ReactNative</a> <a href="/tags/RecyclerView/" style="font-size: 18.57px;">RecyclerView</a> <a href="/tags/RxAndroid/" style="font-size: 11.43px;">RxAndroid</a> <a href="/tags/RxJava/" style="font-size: 11.43px;">RxJava</a> <a href="/tags/ViewPager/" style="font-size: 10px;">ViewPager</a> <a href="/tags/cocos/" style="font-size: 10px;">cocos</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/okhttp/" style="font-size: 11.43px;">okhttp</a> <a href="/tags/orm/" style="font-size: 10px;">orm</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/列表动画/" style="font-size: 14.29px;">列表动画</a> <a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a> <a href="/tags/动画/" style="font-size: 15.71px;">动画</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/干货/" style="font-size: 17.14px;">干货</a> <a href="/tags/数据存储/" style="font-size: 10px;">数据存储</a> <a href="/tags/数据库/" style="font-size: 10px;">数据库</a> <a href="/tags/热更新/" style="font-size: 10px;">热更新</a> <a href="/tags/特效/" style="font-size: 10px;">特效</a> <a href="/tags/自定义控件/" style="font-size: 17.14px;">自定义控件</a> <a href="/tags/适配/" style="font-size: 10px;">适配</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://git.oschina.net/">Git@OSC</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我就是我 是颜色不一样的烟火</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">NightFarmer</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">NightFarmer</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">理论指导实践，实践深化理论</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <li id="Email"><a class="Email" target="_blank" href="mailto:494090597@qq.com" title="Email"></a></li>
+                            
+                                <li id="新浪微博"><a class="新浪微博" target="_blank" href="http://weibo.com/NightFarmer" title="新浪微博"></a></li>
+                            
+                                <li id="GitHub"><a class="GitHub" target="_blank" href="https://github.com/NightFarmer" title="GitHub"></a></li>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-MakeSwitchButton" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/08/20/MakeSwitchButton/" class="article-date">
+      <time datetime="2015-08-20T15:41:26.000Z" itemprop="datePublished">2015-08-20</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      自定义控件-定义一个开关按钮
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/自定义控件/">自定义控件</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p><strong>本篇文章用于记录用于开放绘制BitMap相关的自定义控件</strong><br>Android应用程序中有一类自定义控件是由canvas绘制bitmap来构建视图，并通触摸事件或其方法来控制绘制视图的状态。<br>本篇通过记录一个开关按钮的定义来熟悉此类自定义控件的开发流程。<br>先看一下效果图：<br><img src="http://nightfarmer.github.io/public/static/image/switchButton.gif" alt="switchButton"><br><a id="more"></a></p>
+<p>废话不多说，首先我们定义一个叫做SwitchView的类继承自View来作为我们的自定义控件<br>代码如下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SwitchView</span> <span class="keyword">extends</span> <span class="title">View</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SwitchView</span><span class="params">(Context context)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(context);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SwitchView</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(context, attrs);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SwitchView</span><span class="params">(Context context, AttributeSet attrs, <span class="keyword">int</span> defStyleAttr)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(context, attrs, defStyleAttr);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这这时候我们没有做任何自定义的处理，我们定义一个方法用来设置这个控件的图片资源，<br>我们定义的这个控件包括两个状态，打开和关闭，所以我们需要有两张背景图片来标识控件的开关状态，<br>也需要一个按钮图片来让用户来进行操作以及对控件的状态进行展示。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> Bitmap backGroundOn;</div><div class="line"><span class="keyword">private</span> Bitmap backGroundOff;</div><div class="line"><span class="keyword">private</span> Bitmap switchButton;</div><div class="line"></div><div class="line"><span class="keyword">private</span> <span class="keyword">float</span> viewWidth;</div><div class="line"><span class="keyword">private</span> <span class="keyword">float</span> buttonWidth;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setImageResource</span><span class="params">(<span class="keyword">int</span> switchButton, <span class="keyword">int</span> backGroundOn, <span class="keyword">int</span> backGroundOff)</span> </span>&#123;</div><div class="line">    <span class="keyword">this</span>.switchButton = BitmapFactory.decodeResource(getResources(), switchButton);</div><div class="line">    <span class="keyword">this</span>.backGroundOn = BitmapFactory.decodeResource(getResources(), backGroundOn);</div><div class="line">    <span class="keyword">this</span>.backGroundOff = BitmapFactory.decodeResource(getResources(), backGroundOff);</div><div class="line"></div><div class="line">    viewWidth = <span class="keyword">this</span>.backGroundOn.getWidth();</div><div class="line">    buttonWidth = <span class="keyword">this</span>.switchButton.getWidth();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>我们定义了一个叫做setImageResource的方法，在这个方法里我们通过图片资源参数生成了相应的bitmap用于控件的绘制<br>同时获取了背景图片的宽度来作为控件的宽度，button的宽度用于之后状态的判断和触摸事件的反馈。<br>接下来先绘制一个状态下的控件视图，复写View的onDraw方法和onMeasure方法分别用于绘制和测量控件<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onDraw(canvas);</div><div class="line">    Bitmap backGround = backGroundOff;</div><div class="line">    canvas.drawBitmap(backGround, <span class="keyword">new</span> Matrix(), <span class="keyword">new</span> Paint());</div><div class="line">    canvas.drawBitmap(switchButton, <span class="number">0</span>, <span class="number">0</span>, <span class="keyword">new</span> Paint());</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">    setMeasuredDimension(backGroundOn.getWidth(), backGroundOn.getHeight());</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>上面这段代码并不多，在onDraw方法中先绘制背景图，然后将button按钮绘制在背景图上方，初始位置为0,0坐标<br>在onMeasure方法中指定控件的宽高为背景图的宽和高，这时候我们就可以在xml布局文件中调用我们的自定义控件，<br>指定资源文件后就可以看到初始状态下的UI。</p>
+<p>但是此时这个控件只有一个关闭状态，下面我们为这个控件增加打开状态并新增状态标识以及切换状态的方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">float</span> buttonX = <span class="number">0</span>;</div><div class="line"><span class="keyword">private</span> <span class="keyword">boolean</span> checked;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isChecked</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> checked;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setChecked</span><span class="params">(<span class="keyword">boolean</span> checked)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.checked == checked) <span class="keyword">return</span>;</div><div class="line">    <span class="keyword">this</span>.checked = checked;</div><div class="line">    invalidate();</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onDraw(canvas);</div><div class="line">    Bitmap backGround;</div><div class="line">    <span class="keyword">if</span> (!pressed) &#123;</div><div class="line">        <span class="keyword">if</span> (checked) &#123;</div><div class="line">            buttonX = viewWidth - buttonWidth;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            buttonX = <span class="number">0</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (buttonX&lt;viewWidth / <span class="number">2</span>)&#123;</div><div class="line">        backGround = backGroundOff;</div><div class="line">    &#125;<span class="keyword">else</span> &#123;</div><div class="line">        backGround = backGroundOn;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    canvas.drawBitmap(backGround, <span class="keyword">new</span> Matrix(), <span class="keyword">new</span> Paint());</div><div class="line">    canvas.drawBitmap(switchButton, buttonX, <span class="number">0</span>, <span class="keyword">new</span> Paint());</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>新增两个变量，checked用于设定和获取开关按钮的不同状态，buttonX则用于记录不同状态下按钮的绘制起始位置，<br>之所以将buttonX作为控件的成员变量而不是方法内的变量，是因为我们还要在下面的触摸事件中设置这个值。<br>这时候我们已经可以通过checked的get/set方法来切换控件的开关状态了，我们还要为这个控件增加触摸事件来响应用户的点击以及拖拉操作。<br>复写View的onTouchEvent事件来监听用户的手势<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onTouchEvent</span><span class="params">(MotionEvent event)</span> </span>&#123;</div><div class="line">    <span class="keyword">switch</span> (event.getAction()) &#123;</div><div class="line">        <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</div><div class="line">            pressed = <span class="keyword">true</span>;</div><div class="line">            <span class="keyword">break</span>;</div><div class="line"></div><div class="line">        <span class="keyword">case</span> MotionEvent.ACTION_MOVE:</div><div class="line">            pressed = <span class="keyword">true</span>;</div><div class="line">            buttonX = event.getX() - buttonWidth / <span class="number">2</span>;</div><div class="line">            <span class="keyword">if</span> (buttonX &lt; <span class="number">0</span>) buttonX = <span class="number">0</span>;</div><div class="line">            <span class="keyword">if</span> (buttonX &gt; viewWidth - buttonWidth) buttonX = viewWidth - buttonWidth;</div><div class="line">            <span class="keyword">break</span>;</div><div class="line"></div><div class="line">        <span class="keyword">case</span> MotionEvent.ACTION_UP:</div><div class="line">            pressed = <span class="keyword">false</span>;</div><div class="line">            checked = event.getX() &gt; viewWidth / <span class="number">2</span>;</div><div class="line">            <span class="keyword">if</span> (listener != <span class="keyword">null</span>) &#123;</div><div class="line">                listener.onChange(<span class="keyword">this</span>, checked);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">break</span>;</div><div class="line"></div><div class="line">        <span class="keyword">default</span>:</div><div class="line">            pressed = <span class="keyword">false</span>;</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">    &#125;</div><div class="line">    invalidate();</div><div class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>触摸事件的监听的核心逻辑在move和up中，move中判断触摸点位于View的x坐标，并根据x坐标来设定button的绘制起始x坐标<br>在up中，根据触摸离开时的坐标点来盘点控件应该切换到哪个状态，这里我们根据触摸的x坐标位于控件中心点的左右来作为判断的依据。</p>
+<blockquote>
+<p>上面代码中的press变量来存贮和标识控件是否处于触摸操作中，这个变量在绘制时用到，如果处于触摸中则使用实时的button绘制坐标，反之则根据开关状态将button绘制到控件两侧</p>
+</blockquote>
+<p>上面还在up中调用了监听回调，这是对控件开关状态切换的监听，补全状态监听的代码，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> OnCheckedStateChangedListener listener;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOnCheckedStateChangedListener</span><span class="params">(OnCheckedStateChangedListener listener)</span> </span>&#123;</div><div class="line">    <span class="keyword">this</span>.listener = listener;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setChecked</span><span class="params">(<span class="keyword">boolean</span> checked)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.checked == checked) <span class="keyword">return</span>;</div><div class="line">    <span class="keyword">this</span>.checked = checked;</div><div class="line">    invalidate();</div><div class="line">    <span class="keyword">if</span> (listener != <span class="keyword">null</span>) &#123;</div><div class="line">        listener.onChange(<span class="keyword">this</span>, checked);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">OnCheckedStateChangedListener</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onChange</span><span class="params">(SwitchView switchView, <span class="keyword">boolean</span> checked)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这时候我们的自定义开关控件已经大致定义完成了，当然也可以为这个控件新增一些自定义属性，如在xml布局文件中指定图片资源等。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2015/08/24/AndroidPaintView/">
+                    自定义控件-使用Canvas绘图定义一个手写板
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2015/06/23/Recycler-Grid/">
+                    使用RecyclerView实现Grid节点的拖拽排序
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+
+
+
+    <div class="share">
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+    <a href="#" class="bds_copy" data-cmd="copy" title="复制网址"></a>
+    <a href="#" class="bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+    </div>
+    <script>
+        window._bd_share_config={
+            "common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+</div>
+
+
+
+    
+      <div class="duoshuo" id="comments">
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="2015/08/20/MakeSwitchButton/" data-title="自定义控件-定义一个开关按钮" data-url="http://nightfarmer.github.io/2015/08/20/MakeSwitchButton/"></div>
+    <!-- 多说评论框 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"nightfarmer"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://nightfarmer.github.io/js/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+</div>
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2015/08/24/AndroidPaintView/" title="上一篇: 自定义控件-使用Canvas绘图定义一个手写板">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2015/06/23/Recycler-Grid/" title="下一篇: 使用RecyclerView实现Grid节点的拖拽排序">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/02/14/RnMobX/">在ReactNative中使用MobX框架管理State实现ListView的局部刷新</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/02/DiffUtil/">Android7.0新增工具DiffUtil详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/01/GPSUtil/">WGS84、GCJ02、BD09地图坐标系间的坐标转换及坐标距离计算</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/21/GreenDao3Doc/">SQLite数据库Orm框架GreenDao3使用详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/MediaPlayer/">使用MediaPlayer开发简单的在线音乐播放器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/StethoSummary/">使用来自Facebook的调试神器Stetho对Android应用程序进行调试</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/30/InitWinEnv/">使用Chocolatey包管理器一键搭建windows开发环境</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/22/AutoBuildApk/">Linux开发环境中使用shell/python脚本快速自动打包并查看apk文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/12/InterpolatorPreview/">自定义view展示官方Interpolator并扩展自定义Interpolator</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/09/ScriptIntrinsicBlur/">使用v8兼容包对图片进行高斯模糊处理/毛玻璃效果</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/07/ColorTheme/">给应用增加动态切换主题配色的功能</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/01/RxJavaFuncs/">RxJava常用操作符分类总汇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/31/RxJavaClick/">使用RxJava实现多次连续点击的事件监听</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/24/GoogleMVP/">浅析Google官方AndroidMVP架构示例</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/23/BezierDrawer/">做一个二阶Bezier曲线的绘图工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/19/ProxyRequst/">使用动态代理对网络请求接口进行面向对象封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/10/luabridge/">有关Android热更新/热补丁的一种新的解决方案</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/08/CircleWave/">通过自定义控件绘制实现雷达/水波纹的动画扩散效果</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/04/SatelliteButton/">设计一个通用的卫星菜单</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/03/make-a-wheel/">造一个“轮子”</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/29/make-a-home/">创建一个简单的android桌面APP</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/20/PageViewTab/">为ViewPager创建可自由设置高亮样式的TabBar</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/24/Recycler-Tree/">实现基于RecyclerView的树形组件封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/30/AS-SerialVersionUID/">AndroidStudio 自动生成 SerialVersionUID</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/30/AndroidLocalData/">android轻量级本地数据存储的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/25/ReactNative-libs/">ReactNative的一些参考资料以及第三方库</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/24/RecyAnim/">给滚动列表项增加渐显载入动画</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/17/Kotlin-anko/">使用Kotlin开发Android之anko扩展</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/13/EventBus/">通过EventBus实现android各组件间数据通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/12/Kotlin-yf/">使用Kotlin开发Android的常用技巧</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/25/Kotlin-android-EV/">AndroidStudio-Kotlin插件安装配置及工程配置调整</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/20/js-android/">使用JavaScript反射调用Android应用Native代码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/19/ExpandAnimList/">设计一个带有动画的可用展开/折叠的列表控件</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/16/JitpackUse/">发布自己的开源库到jitpack供gradle依赖调用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/14/listAnim1/">多种样式的列表item动画集合</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/BaseItemAnimator/">通过扩展ItemAnimator实现对Item的创建/移除动画进行抽象封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/RandomShowTextView/">实现一个随机字符显现/隐藏的TextView</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/ItemAnimator/">解析DefaultItemAnimator源码了解ItemAnimator动画处理器实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/12/MoneyInput/">android实现限制数值输入范围的金额EditText控制</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/01/View-onMeasure/">源码解析自定义View的onMeasure方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/15/OKHttpForm/">OKHttp3-多文件form表单形式上传的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/12/OKHttpDownload/">OKHttp3-扩展带有进度监听的下载回调</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/02/openFile/">调用Android设备中已经安装的软件打开各种类型的指定文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/24/AndroidPaintView/">自定义控件-使用Canvas绘图定义一个手写板</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/20/MakeSwitchButton/">自定义控件-定义一个开关按钮</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/23/Recycler-Grid/">使用RecyclerView实现Grid节点的拖拽排序</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/08/Recycler-pbl/">使用RecyclerView实现无限滚动瀑布流</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/03/RecyclerView/">RecyclerView的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/04/20/AS-HotKey/">AndroidStudio常用快捷键记录</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/11/AsyncDoc/">Async.js v2.0.0-pre官方文档翻译(未完成)</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/10/jsbind/">深入浅出 妙用JavaScript中apply、call、bind</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/06/makelianliankan1/">使用cocos2d引擎开发连连看的尝试</a></li><li class="post-list-item"><a class="post-list-link" href="/2014/03/07/AndroidScreenAdaptation/">Android屏幕分率适配</a></li><li class="post-list-item"><a class="post-list-link" href="/2014/03/01/HelloBlog/">Hello Blog</a></li></ul>
+    <script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2017 NightFarmer
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme Yelee by MOxFIVE
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >本站到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

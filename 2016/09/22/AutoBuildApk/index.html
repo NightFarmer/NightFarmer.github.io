@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux开发环境中使用shell/python脚本快速自动打包并查看apk文件 | NightFarmer&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="最近工作中突然遇到一个很烦人的问题, 事情的起因是这样的. 我参与开发/维护着大概5个项目, 负责服务端后台的同事经常在自己的本地电脑启着本地服务测试一些东西, 而他们的本地局域网IP是经常变动的, 那么问题来了, 只要他们的IP地址变动了就会过来找我针对某个局域网IP地址为某个项目打个包, 烦不胜烦. 甚至有些情况下需要两项目同时开发, AndroidStudio需要连着开好几个, 但是电脑受不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux开发环境中使用shell/python脚本快速自动打包并查看apk文件">
+<meta property="og:url" content="http://nightfarmer.github.io/2016/09/22/AutoBuildApk/index.html">
+<meta property="og:site_name" content="NightFarmer's Blog">
+<meta property="og:description" content="最近工作中突然遇到一个很烦人的问题, 事情的起因是这样的. 我参与开发/维护着大概5个项目, 负责服务端后台的同事经常在自己的本地电脑启着本地服务测试一些东西, 而他们的本地局域网IP是经常变动的, 那么问题来了, 只要他们的IP地址变动了就会过来找我针对某个局域网IP地址为某个项目打个包, 烦不胜烦. 甚至有些情况下需要两项目同时开发, AndroidStudio需要连着开好几个, 但是电脑受不">
+<meta property="og:updated_time" content="2017-02-14T01:08:44.976Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux开发环境中使用shell/python脚本快速自动打包并查看apk文件">
+<meta name="twitter:description" content="最近工作中突然遇到一个很烦人的问题, 事情的起因是这样的. 我参与开发/维护着大概5个项目, 负责服务端后台的同事经常在自己的本地电脑启着本地服务测试一些东西, 而他们的本地局域网IP是经常变动的, 那么问题来了, 只要他们的IP地址变动了就会过来找我针对某个局域网IP地址为某个项目打个包, 烦不胜烦. 甚至有些情况下需要两项目同时开发, AndroidStudio需要连着开好几个, 但是电脑受不">
+  
+    <link rel="alternative" href="/atom.xml" title="NightFarmer&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false,
+      }
+  </script>
+
+  
+      <script>
+          yiliaConfig.rootUrl = "/";
+      </script>
+  
+
+  
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn js-avatar">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">NightFarmer</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">理论指导实践，实践深化理论</p>
+        
+                
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <li id="Email"><a class="Email" target="_blank" href="mailto:494090597@qq.com" title="Email"></a></li>
+                            
+                                <li id="新浪微博"><a class="新浪微博" target="_blank" href="http://weibo.com/NightFarmer" title="新浪微博"></a></li>
+                            
+                                <li id="GitHub"><a class="GitHub" target="_blank" href="https://github.com/NightFarmer" title="GitHub"></a></li>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/AS/" style="font-size: 11.43px;">AS</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Android架构/" style="font-size: 10px;">Android架构</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Bezier曲线/" style="font-size: 10px;">Bezier曲线</a> <a href="/tags/Doc/" style="font-size: 10px;">Doc</a> <a href="/tags/EventBus/" style="font-size: 10px;">EventBus</a> <a href="/tags/File/" style="font-size: 10px;">File</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.86px;">JavaScript</a> <a href="/tags/Kotlin/" style="font-size: 12.86px;">Kotlin</a> <a href="/tags/Lua/" style="font-size: 10px;">Lua</a> <a href="/tags/NDK/" style="font-size: 10px;">NDK</a> <a href="/tags/ReactNative/" style="font-size: 11.43px;">ReactNative</a> <a href="/tags/RecyclerView/" style="font-size: 18.57px;">RecyclerView</a> <a href="/tags/RxAndroid/" style="font-size: 11.43px;">RxAndroid</a> <a href="/tags/RxJava/" style="font-size: 11.43px;">RxJava</a> <a href="/tags/ViewPager/" style="font-size: 10px;">ViewPager</a> <a href="/tags/cocos/" style="font-size: 10px;">cocos</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/okhttp/" style="font-size: 11.43px;">okhttp</a> <a href="/tags/orm/" style="font-size: 10px;">orm</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/列表动画/" style="font-size: 14.29px;">列表动画</a> <a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a> <a href="/tags/动画/" style="font-size: 15.71px;">动画</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/干货/" style="font-size: 17.14px;">干货</a> <a href="/tags/数据存储/" style="font-size: 10px;">数据存储</a> <a href="/tags/数据库/" style="font-size: 10px;">数据库</a> <a href="/tags/热更新/" style="font-size: 10px;">热更新</a> <a href="/tags/特效/" style="font-size: 10px;">特效</a> <a href="/tags/自定义控件/" style="font-size: 17.14px;">自定义控件</a> <a href="/tags/适配/" style="font-size: 10px;">适配</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://git.oschina.net/">Git@OSC</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我就是我 是颜色不一样的烟火</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">NightFarmer</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">NightFarmer</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">理论指导实践，实践深化理论</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <li id="Email"><a class="Email" target="_blank" href="mailto:494090597@qq.com" title="Email"></a></li>
+                            
+                                <li id="新浪微博"><a class="新浪微博" target="_blank" href="http://weibo.com/NightFarmer" title="新浪微博"></a></li>
+                            
+                                <li id="GitHub"><a class="GitHub" target="_blank" href="https://github.com/NightFarmer" title="GitHub"></a></li>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-AutoBuildApk" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/09/22/AutoBuildApk/" class="article-date">
+      <time datetime="2016-09-22T08:16:15.000Z" itemprop="datePublished">2016-09-22</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Linux开发环境中使用shell/python脚本快速自动打包并查看apk文件
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/干货/">干货</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>最近工作中突然遇到一个很烦人的问题, 事情的起因是这样的. 我参与开发/维护着大概5个项目, 负责服务端后台的同事经常在自己的本地电脑启着本地服务测试一些东西, 而他们的本地局域网IP是经常变动的, 那么问题来了, 只要他们的IP地址变动了就会过来找我针对某个局域网IP地址为某个项目打个包, 烦不胜烦. 甚至有些情况下需要两项目同时开发, AndroidStudio需要连着开好几个, 但是电脑受不了啊, 而且AndroidStudio有一个非常不友好的地方: 如果开启多个AndroidStudio工程, 只要某一个窗口卡了, 那么其余的工程界面也全都是无响应状态的. 当这两个问题重叠到一起的时候, 好了, 可用把鼠标和键盘放一边慢慢等着打包吧, 完了才能继续快乐的编程. 这简直不能忍.<br>今天针对这个问题, 记录一种解决方法, 实现在不打开AndroidStudio的情况下自动打包, 指定version/ip地址等, 并在打包完成后显示签名信息以及apk详细信息且打开apk所在文件夹.<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python buildapk.py -i 192.168.x.x -v 1.2.3</div></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<p>在AndroidStudio给项目打包的时候需要指定keystore然后输入密码,然后选keyAlias,再输入密码,然后才正正确的build以及签名.<br>那么如果需要自动打包,这些东西都不是我们想输入的,就应该怎么简单怎么来.<br>首先我们需要在gradle的配置文件中定义并指定release需要的签名文件以及密码等<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">android &#123;</div><div class="line">    defaultConfig &#123;</div><div class="line">	...</div><div class="line">    &#125;</div><div class="line">    signingConfigs &#123;</div><div class="line">        release &#123;</div><div class="line">            storeFile <span class="keyword">file</span>(<span class="string">'xxx.keystore'</span>)</div><div class="line">            keyPassword <span class="string">'xxx'</span></div><div class="line">            keyAlias <span class="string">'xxx'</span></div><div class="line">            storePassword <span class="string">'xxx'</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    buildTypes &#123;</div><div class="line">        release &#123;</div><div class="line">            ...</div><div class="line">            signingConfig signingConfigs.release</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>这样我们在使用gradle命令来进行build的时候就能够自动从配置文件中找到签名文件进行签名了<br>gradle的realease构建指令是这样的:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./gradlew assembleRelease</div></pre></td></tr></table></figure></p>
+<p>在项目的根目录下输入如上指令即可对项目进行构建并打包出apk并自动签名, 但是到这里对我们来说仍然不够, 在我的场景下打包出apk之后还要把这个文件发给同事, 这时候最起码要把打出来的apk让我能找得到.<br>在ubuntu系统下, 可用通过nautilus指令来用文件管理打开某个路径或某个文件所在的位置<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nautilus nautilus ./app/build/outputs/apk/app-release.apk</div></pre></td></tr></table></figure></p>
+<p>这里可用使用相对路径也可以使用绝对路径</p>
+<p>在项目的根目录新建一个buildapk.sh文件<br>把上面两条指令放进去<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">./gradlew assembleRelease</div><div class="line"><span class="meta">#!/bin/bash</span></div><div class="line">./gradlew assembleRelease</div><div class="line">apkPath=<span class="string">"./app/build/outputs/apk"</span></div><div class="line">apkFile=<span class="variable">$apkPath</span><span class="string">"/app-release.apk"</span></div><div class="line">unzip -qo <span class="variable">$apkFile</span> <span class="_">-d</span> <span class="variable">$apkPath</span><span class="string">"/temp"</span></div><div class="line">keytool -printcert -file <span class="variable">$apkPath</span><span class="string">"/temp/META-INF/CERT.RSA"</span></div><div class="line">nautilus ./app/build/outputs/apk/app-release.apk</div></pre></td></tr></table></figure></p>
+<p>当我们要打包的时候进入项目的根目录执行这个脚本文件即可<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./buildapk.sh</div></pre></td></tr></table></figure></p>
+<p>到此为止我们的shell脚本可以正常的自动打包并打印出签名信息, 但我们仍需要另外一些信息, 比如包名/版本号/应用名等<br>google给我提供的build-tools中有一个叫做aapt的工具给我们提供了这个功能, 使用这个工具类可以打印出apk文件的所有权限以及包的信息, 只需要从这些信息中抓取我们需要的即可<br>鉴于shell脚本的正则过滤不是很好用, 我们这里使用python来代理shell脚本, 并使用python的正则来进行正则校验<br>新建buildapk.py文件, 使用python的os模块来执行以及获取执行的打印结果<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> os,re</div><div class="line"><span class="keyword">import</span> subprocess</div><div class="line"></div><div class="line">os.system(<span class="string">"./gradlew assembleRelease"</span>)</div><div class="line">apkPath = <span class="string">"./app/build/outputs/apk"</span></div><div class="line">apkFile = apkPath + <span class="string">"/app-release.apk"</span></div><div class="line">os.popen(<span class="string">"unzip -qo "</span>+apkFile+<span class="string">" -d "</span>+apkPath+<span class="string">"/temp"</span>)</div><div class="line"><span class="keyword">print</span> os.popen(<span class="string">"keytool -printcert -file "</span> + apkPath + <span class="string">"/temp/META-INF/CERT.RSA"</span>).read()</div></pre></td></tr></table></figure></p>
+<p>这样我们上面的shell脚本就转化为python脚本了, 输入<code>python buildapk.py</code>执行脚本, 我们将得到和之前shell脚本同样的结果</p>
+<p>接下来我们需要使用aapt来获取apk的详细信息<br>aapt位于SDK的build-tools下, 调用的命令为<code>$ANDROID_HOME/build-tools/23.0.3/aapt dump badging apkFile</code>, 前提是已经配置好ANDROID_HOME环境变量了, 反之则需要协商SDK的绝对路径.<br>把上面的命令使用python脚本来执行, 并将打印结果输入到字符串变量中<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">appInfo = os.popen(<span class="string">"$ANDROID_HOME/build-tools/23.0.3/aapt dump badging "</span> + apkFile).read()</div></pre></td></tr></table></figure></p>
+<p>然后我们就可以快乐的用python强大的正则模块来抓取数据了: 如<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">package = re.match(<span class="string">r".* name='([^']+)'.*"</span>, appInfo, re.M|re.I)</div><div class="line"><span class="keyword">print</span> <span class="string">"package: "</span> + package.group(<span class="number">1</span>)</div></pre></td></tr></table></figure></p>
+<p>这里选取package/versionCode/versionName/buildversion/applicationlabel这些信息来抓取并打印展示</p>
+<p>完整的python文件<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> os,re</div><div class="line"><span class="keyword">import</span> subprocess</div><div class="line"><span class="keyword">if</span> __name__==<span class="string">"__main__"</span>: </div><div class="line">	os.system(<span class="string">"./gradlew assembleRelease"</span>)</div><div class="line">	apkPath = <span class="string">"./app/build/outputs/apk"</span></div><div class="line">	apkFile = apkPath + <span class="string">"/app-release.apk"</span></div><div class="line">	os.popen(<span class="string">"unzip -qo "</span>+apkFile+<span class="string">" -d "</span>+apkPath+<span class="string">"/temp"</span>)</div><div class="line">	<span class="keyword">print</span> os.popen(<span class="string">"keytool -printcert -file "</span> + apkPath + <span class="string">"/temp/META-INF/CERT.RSA"</span>).read()</div><div class="line">	appInfo = os.popen(<span class="string">"$ANDROID_HOME/build-tools/23.0.3/aapt dump badging "</span> + apkFile).read()</div><div class="line">	package = re.match(<span class="string">r".* name='([^']+)'.*"</span>, appInfo, re.M|re.I)</div><div class="line">	<span class="keyword">print</span> <span class="string">"package: "</span> + package.group(<span class="number">1</span>)</div><div class="line">	versionCode = re.match(<span class="string">r".* versionCode='([^']+)'.*"</span>, appInfo, re.M|re.I)</div><div class="line">	<span class="keyword">print</span> <span class="string">"versionCode: "</span> + versionCode.group(<span class="number">1</span>)</div><div class="line">	versionName = re.match(<span class="string">r".* versionName='([^']+)'.*"</span>, appInfo, re.M|re.I)</div><div class="line">	<span class="keyword">print</span> <span class="string">"versionName: "</span> + versionName.group(<span class="number">1</span>)</div><div class="line">	platformBuildVersionName = re.match(<span class="string">r".* platformBuildVersionName='([^']+)'.*"</span>, appInfo, re.M|re.I)</div><div class="line">	<span class="keyword">print</span> <span class="string">"platformBuildVersionName: "</span> + platformBuildVersionName.group(<span class="number">1</span>)</div><div class="line">	applicationLabel = re.match(<span class="string">r"[\s\S]*application: label='([^']+)'.*"</span>, appInfo, re.M|re.I)</div><div class="line">	<span class="keyword">print</span> <span class="string">"applicationLabel: "</span> + applicationLabel.group(<span class="number">1</span>)</div><div class="line">	subprocess.Popen(<span class="string">"nautilus ./app/build/outputs/apk/app-release.apk"</span>, shell=<span class="keyword">True</span>, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)</div></pre></td></tr></table></figure></p>
+<p>打包后的输出内容:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">:app:zipalignRelease UP-TO-DATE</div><div class="line">:app:assembleRelease</div><div class="line"></div><div class="line">BUILD SUCCESSFUL</div><div class="line"></div><div class="line">Total time: 3.255 secs</div><div class="line">所有者: CN=xxx, OU=xxx, O=xxx, L=xxx, ST=xxx, C=china</div><div class="line">发布者: CN=xxx, OU=xxx, O=xxx, L=xxx, ST=xxx, C=china</div><div class="line">序列号: 4ee590e7</div><div class="line">有效期开始日期: Mon Dec 12 13:28:07 CST 2011, 截止日期: Fri Dec 05 13:28:07 CST 2036</div><div class="line">证书指纹:</div><div class="line">	 MD5: 4A:55:A7:3F:92:6D:25:8A:44:3E:6A:7A:CC:xx:xx:xx</div><div class="line">	 SHA1: 93:69:E2:98:F5:F9:EC:AA:AA:D4:B2:22:C4:A6:02:B7:54:xx:xx:xx</div><div class="line">	 SHA256: DC:CC:7F:85:F4:03:78:62:C8:1E:3C:75:5B:E9:F7:38:A2:50:B9:0E:93:1A:DE:BC:E7:C1:66:DA:5F:xx:xx:xx</div><div class="line">	 签名算法名称: SHA1withRSA</div><div class="line">	 版本: 3</div><div class="line"></div><div class="line">package: xx.xx.xx</div><div class="line">versionCode: 1</div><div class="line">versionName: 1.2.2</div><div class="line">platformBuildVersionName: 6.0-2704002</div><div class="line">applicationLabel: xxxx</div></pre></td></tr></table></figure></p>
+<p>再回到最初的需求, 我们想在没有修改业务代码需求的情况下, 只变更ip或者版本号进行自动打包.<br>到此只实现了自动打包, 现在仍需要编写这只版本号和ip的部分, 这里用版本号的设定作为示例</p>
+<p>如果你的工程是一个标准的AndroidStudio工程, 那么版本号的配置比然是写在buid.gradle文件中的, 要实现版本号的设定只需要重写build.gradle文件中的versionName字段即可<br>而python的正则模块中也为我们提供了正则替换的方法<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">re.sub(<span class="string">r'versionName "[^"]+"'</span>, <span class="string">'rersionName "新版本"'</span>, txt)</div></pre></td></tr></table></figure></p>
+<p>我们只需要讲配置文件读取到字符串中, 并使用正则替换即可<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">setVersonName</span><span class="params">(version)</span>:</span></div><div class="line">	f = open(<span class="string">"./app/build.gradle"</span>, <span class="string">"r"</span>)</div><div class="line">	txt = f.read()</div><div class="line">	f.close()</div><div class="line"></div><div class="line">	txt = re.sub(<span class="string">r'versionName "[^"]+"'</span>, <span class="string">'versionName "'</span>+version+<span class="string">'"'</span>, txt)</div><div class="line">	f = open(<span class="string">"./app/build.gradle"</span>, <span class="string">"w"</span>)</div><div class="line">	f.write(txt)</div><div class="line">	f.close()</div></pre></td></tr></table></figure></p>
+<p>那这个方法该如何调用呢? setVersonName(“1.1.1”) 这样码? 太low!<br>如上这样的调用方法需要在每次修改version的时候都要修改python文件, 偷懒是提升技术的动力..<br>我们想要一种更加便捷的方法来使用 如:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python buildapk.py -v 1.1.1</div></pre></td></tr></table></figure></p>
+<p>只需要在python文件中加上参数列表的获取即可<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> __name__==<span class="string">"__main__"</span>:</div><div class="line">	<span class="keyword">import</span> sys</div><div class="line">	vIndex = <span class="number">-1</span></div><div class="line">	<span class="keyword">if</span> <span class="string">"-v"</span> <span class="keyword">in</span> sys.argv:</div><div class="line">		vIndex = sys.argv.index(<span class="string">"-v"</span>)</div><div class="line">	<span class="keyword">if</span> vIndex&gt;<span class="number">0</span> <span class="keyword">and</span> len(sys.argv)&gt;vIndex+<span class="number">1</span> :</div><div class="line">		print(<span class="string">"v"</span>)</div><div class="line">		setVersonName(sys.argv[vIndex+<span class="number">1</span>])</div><div class="line">	</div><div class="line">	...</div></pre></td></tr></table></figure></p>
+<p>sys.argv中传入了命令行后的参数列表, 这里首先判断参数中是否存在-v, 若存在则尝试获取取-v的下一个参数作为version</p>
+<p>ip地址的设定同理, 不过修改的是java文件, 这里不再做赘述了</p>
+<p>接下来的工作中就可以尽情的使用python脚本来构建apk了<br>某个ip来一个<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python buildapk.py -i 192.168.x.x</div></pre></td></tr></table></figure></p>
+<p>某个ip来一个旧版本号的<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python buildapk.py -i 192.168.x.x -v 1.1.0</div></pre></td></tr></table></figure></p>
+<p>正式服务器最新版的来一个<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python buildapk.py -i www.xxx.com</div></pre></td></tr></table></figure></p>
+<p>完工.</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2016/09/30/InitWinEnv/">
+                    使用Chocolatey包管理器一键搭建windows开发环境
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2016/09/12/InterpolatorPreview/">
+                    自定义view展示官方Interpolator并扩展自定义Interpolator
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+
+
+
+    <div class="share">
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+    <a href="#" class="bds_copy" data-cmd="copy" title="复制网址"></a>
+    <a href="#" class="bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+    </div>
+    <script>
+        window._bd_share_config={
+            "common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+</div>
+
+
+
+    
+      <div class="duoshuo" id="comments">
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="2016/09/22/AutoBuildApk/" data-title="Linux开发环境中使用shell/python脚本快速自动打包并查看apk文件" data-url="http://nightfarmer.github.io/2016/09/22/AutoBuildApk/"></div>
+    <!-- 多说评论框 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"nightfarmer"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://nightfarmer.github.io/js/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+</div>
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2016/09/30/InitWinEnv/" title="上一篇: 使用Chocolatey包管理器一键搭建windows开发环境">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2016/09/12/InterpolatorPreview/" title="下一篇: 自定义view展示官方Interpolator并扩展自定义Interpolator">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/02/14/RnMobX/">在ReactNative中使用MobX框架管理State实现ListView的局部刷新</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/02/DiffUtil/">Android7.0新增工具DiffUtil详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/01/GPSUtil/">WGS84、GCJ02、BD09地图坐标系间的坐标转换及坐标距离计算</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/21/GreenDao3Doc/">SQLite数据库Orm框架GreenDao3使用详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/MediaPlayer/">使用MediaPlayer开发简单的在线音乐播放器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/StethoSummary/">使用来自Facebook的调试神器Stetho对Android应用程序进行调试</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/30/InitWinEnv/">使用Chocolatey包管理器一键搭建windows开发环境</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/22/AutoBuildApk/">Linux开发环境中使用shell/python脚本快速自动打包并查看apk文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/12/InterpolatorPreview/">自定义view展示官方Interpolator并扩展自定义Interpolator</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/09/ScriptIntrinsicBlur/">使用v8兼容包对图片进行高斯模糊处理/毛玻璃效果</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/07/ColorTheme/">给应用增加动态切换主题配色的功能</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/01/RxJavaFuncs/">RxJava常用操作符分类总汇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/31/RxJavaClick/">使用RxJava实现多次连续点击的事件监听</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/24/GoogleMVP/">浅析Google官方AndroidMVP架构示例</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/23/BezierDrawer/">做一个二阶Bezier曲线的绘图工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/19/ProxyRequst/">使用动态代理对网络请求接口进行面向对象封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/10/luabridge/">有关Android热更新/热补丁的一种新的解决方案</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/08/CircleWave/">通过自定义控件绘制实现雷达/水波纹的动画扩散效果</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/04/SatelliteButton/">设计一个通用的卫星菜单</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/03/make-a-wheel/">造一个“轮子”</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/29/make-a-home/">创建一个简单的android桌面APP</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/20/PageViewTab/">为ViewPager创建可自由设置高亮样式的TabBar</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/24/Recycler-Tree/">实现基于RecyclerView的树形组件封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/30/AS-SerialVersionUID/">AndroidStudio 自动生成 SerialVersionUID</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/30/AndroidLocalData/">android轻量级本地数据存储的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/25/ReactNative-libs/">ReactNative的一些参考资料以及第三方库</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/24/RecyAnim/">给滚动列表项增加渐显载入动画</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/17/Kotlin-anko/">使用Kotlin开发Android之anko扩展</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/13/EventBus/">通过EventBus实现android各组件间数据通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/12/Kotlin-yf/">使用Kotlin开发Android的常用技巧</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/25/Kotlin-android-EV/">AndroidStudio-Kotlin插件安装配置及工程配置调整</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/20/js-android/">使用JavaScript反射调用Android应用Native代码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/19/ExpandAnimList/">设计一个带有动画的可用展开/折叠的列表控件</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/16/JitpackUse/">发布自己的开源库到jitpack供gradle依赖调用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/14/listAnim1/">多种样式的列表item动画集合</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/BaseItemAnimator/">通过扩展ItemAnimator实现对Item的创建/移除动画进行抽象封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/RandomShowTextView/">实现一个随机字符显现/隐藏的TextView</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/ItemAnimator/">解析DefaultItemAnimator源码了解ItemAnimator动画处理器实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/12/MoneyInput/">android实现限制数值输入范围的金额EditText控制</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/01/View-onMeasure/">源码解析自定义View的onMeasure方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/15/OKHttpForm/">OKHttp3-多文件form表单形式上传的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/12/OKHttpDownload/">OKHttp3-扩展带有进度监听的下载回调</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/02/openFile/">调用Android设备中已经安装的软件打开各种类型的指定文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/24/AndroidPaintView/">自定义控件-使用Canvas绘图定义一个手写板</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/20/MakeSwitchButton/">自定义控件-定义一个开关按钮</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/23/Recycler-Grid/">使用RecyclerView实现Grid节点的拖拽排序</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/08/Recycler-pbl/">使用RecyclerView实现无限滚动瀑布流</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/03/RecyclerView/">RecyclerView的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/04/20/AS-HotKey/">AndroidStudio常用快捷键记录</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/11/AsyncDoc/">Async.js v2.0.0-pre官方文档翻译(未完成)</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/10/jsbind/">深入浅出 妙用JavaScript中apply、call、bind</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/06/makelianliankan1/">使用cocos2d引擎开发连连看的尝试</a></li><li class="post-list-item"><a class="post-list-link" href="/2014/03/07/AndroidScreenAdaptation/">Android屏幕分率适配</a></li><li class="post-list-item"><a class="post-list-link" href="/2014/03/01/HelloBlog/">Hello Blog</a></li></ul>
+    <script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2017 NightFarmer
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme Yelee by MOxFIVE
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >本站到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>有关Android热更新/热补丁的一种新的解决方案 | NightFarmer&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在Android开发工作中热更新一直是个遗留问题，虽然GooglePlay或者苹果商店的应用审核中都是禁止App这么做的，但仍有大量的开发者想要通过热更新或者热补丁来对已经发布的应用进行更新，而不用重新打包发布一个新的版本，毕竟一个刚发布的应用如果因为一个小bug而让用户再次进行更新，一是用户体验不好，二是发布的过程太过繁琐。之前也因为热更新的问题做过各种各样的尝试，包括H5，ReactNativ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="有关Android热更新/热补丁的一种新的解决方案">
+<meta property="og:url" content="http://nightfarmer.github.io/2016/08/10/luabridge/index.html">
+<meta property="og:site_name" content="NightFarmer's Blog">
+<meta property="og:description" content="在Android开发工作中热更新一直是个遗留问题，虽然GooglePlay或者苹果商店的应用审核中都是禁止App这么做的，但仍有大量的开发者想要通过热更新或者热补丁来对已经发布的应用进行更新，而不用重新打包发布一个新的版本，毕竟一个刚发布的应用如果因为一个小bug而让用户再次进行更新，一是用户体验不好，二是发布的过程太过繁琐。之前也因为热更新的问题做过各种各样的尝试，包括H5，ReactNativ">
+<meta property="og:updated_time" content="2017-02-14T01:08:44.980Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="有关Android热更新/热补丁的一种新的解决方案">
+<meta name="twitter:description" content="在Android开发工作中热更新一直是个遗留问题，虽然GooglePlay或者苹果商店的应用审核中都是禁止App这么做的，但仍有大量的开发者想要通过热更新或者热补丁来对已经发布的应用进行更新，而不用重新打包发布一个新的版本，毕竟一个刚发布的应用如果因为一个小bug而让用户再次进行更新，一是用户体验不好，二是发布的过程太过繁琐。之前也因为热更新的问题做过各种各样的尝试，包括H5，ReactNativ">
+  
+    <link rel="alternative" href="/atom.xml" title="NightFarmer&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false,
+      }
+  </script>
+
+  
+      <script>
+          yiliaConfig.rootUrl = "/";
+      </script>
+  
+
+  
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn js-avatar">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">NightFarmer</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">理论指导实践，实践深化理论</p>
+        
+                
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <li id="Email"><a class="Email" target="_blank" href="mailto:494090597@qq.com" title="Email"></a></li>
+                            
+                                <li id="新浪微博"><a class="新浪微博" target="_blank" href="http://weibo.com/NightFarmer" title="新浪微博"></a></li>
+                            
+                                <li id="GitHub"><a class="GitHub" target="_blank" href="https://github.com/NightFarmer" title="GitHub"></a></li>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/AS/" style="font-size: 11.43px;">AS</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Android架构/" style="font-size: 10px;">Android架构</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Bezier曲线/" style="font-size: 10px;">Bezier曲线</a> <a href="/tags/Doc/" style="font-size: 10px;">Doc</a> <a href="/tags/EventBus/" style="font-size: 10px;">EventBus</a> <a href="/tags/File/" style="font-size: 10px;">File</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.86px;">JavaScript</a> <a href="/tags/Kotlin/" style="font-size: 12.86px;">Kotlin</a> <a href="/tags/Lua/" style="font-size: 10px;">Lua</a> <a href="/tags/NDK/" style="font-size: 10px;">NDK</a> <a href="/tags/ReactNative/" style="font-size: 11.43px;">ReactNative</a> <a href="/tags/RecyclerView/" style="font-size: 18.57px;">RecyclerView</a> <a href="/tags/RxAndroid/" style="font-size: 11.43px;">RxAndroid</a> <a href="/tags/RxJava/" style="font-size: 11.43px;">RxJava</a> <a href="/tags/ViewPager/" style="font-size: 10px;">ViewPager</a> <a href="/tags/cocos/" style="font-size: 10px;">cocos</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/okhttp/" style="font-size: 11.43px;">okhttp</a> <a href="/tags/orm/" style="font-size: 10px;">orm</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/列表动画/" style="font-size: 14.29px;">列表动画</a> <a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a> <a href="/tags/动画/" style="font-size: 15.71px;">动画</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/干货/" style="font-size: 17.14px;">干货</a> <a href="/tags/数据存储/" style="font-size: 10px;">数据存储</a> <a href="/tags/数据库/" style="font-size: 10px;">数据库</a> <a href="/tags/热更新/" style="font-size: 10px;">热更新</a> <a href="/tags/特效/" style="font-size: 10px;">特效</a> <a href="/tags/自定义控件/" style="font-size: 17.14px;">自定义控件</a> <a href="/tags/适配/" style="font-size: 10px;">适配</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://git.oschina.net/">Git@OSC</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我就是我 是颜色不一样的烟火</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">NightFarmer</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">NightFarmer</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">理论指导实践，实践深化理论</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <li id="Email"><a class="Email" target="_blank" href="mailto:494090597@qq.com" title="Email"></a></li>
+                            
+                                <li id="新浪微博"><a class="新浪微博" target="_blank" href="http://weibo.com/NightFarmer" title="新浪微博"></a></li>
+                            
+                                <li id="GitHub"><a class="GitHub" target="_blank" href="https://github.com/NightFarmer" title="GitHub"></a></li>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-luabridge" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/08/10/luabridge/" class="article-date">
+      <time datetime="2016-08-10T06:17:23.000Z" itemprop="datePublished">2016-08-10</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      有关Android热更新/热补丁的一种新的解决方案
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NDK/">NDK</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/热更新/">热更新</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>在Android开发工作中热更新一直是个遗留问题，虽然GooglePlay或者苹果商店的应用审核中都是禁止App这么做的，但仍有大量的开发者想要通过热更新或者热补丁来对已经发布的应用进行更新，而不用重新打包发布一个新的版本，毕竟一个刚发布的应用如果因为一个小bug而让用户再次进行更新，一是用户体验不好，二是发布的过程太过繁琐。<br>之前也因为热更新的问题做过各种各样的尝试，包括H5，ReactNative，动态加载dex，使用Javascript和java交互等，单都因为各种原因造成不能在生产环境中使用。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">方案</th>
+<th style="text-align:left">问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">H5/H5+</td>
+<td style="text-align:left">性能瓶颈在于设备WebView对html和JS的解析效率, 且WebView的加载是异步的，界面初始化时会空白一段时间，尝试使用腾讯TBS以及H5+SDK效果并不理想，尝试使用各种mobileUI框架依然存在卡顿帧数过低等各种不理想的问题。</td>
+</tr>
+<tr>
+<td style="text-align:left">ReactNative</td>
+<td style="text-align:left">RN是FaceBook提供的一个跨平台的开发框架，使用NodeJs来写JSX和CSS来进行布局和实现业务逻辑，门槛稍高(这不是问题)，使用RN实现的Android和iOS应用可用达到和原生应用相媲美的流畅度(也确实是原生的)，可以通过从服务器下载js文件来实现热更新，但是如果想要实现原生应用酷炫的效果则是不满足的，且自定义控件的事件传递会被RN容器干扰，RN本来是为iOS而设计的，近期才考虑兼容了Android，对android的支持也还暂时不充足。</td>
+</tr>
+<tr>
+<td style="text-align:left">动态加载dex</td>
+<td style="text-align:left">在Dalvik虚拟机下的android环境这个方案是可行的，但是在android4.4之后google发布了新的虚拟机(ART)，因ART在app安装过程会对dex的bytecode进行优化并进一步解析成机器码，使得在程序运行期间hook代码变得更有难度，在不能放弃5.0及之后的用户的前提下，这个问题是致命的</td>
+</tr>
+<tr>
+<td style="text-align:left">Javascript</td>
+<td style="text-align:left">使用jDK或者webview解析Javascript也能实现一部分的业务逻辑转移，但此方案的局限性太大，不能大规模的使用。</td>
+</tr>
+</tbody>
+</table>
+<p>上面这些是我从接触热更新到目前为止所踩过的坑，可以看到暂时是没有任何一个方案是比较完善或者能用在生产环境的。<br>那么下面，高能来了。</p>
+<a id="more"></a>
+<p>事情的起因是前段事件突然想山寨一个app，当时是对MaterialDesign比较感兴趣，于是选了BiliBili客户端作为山寨的模板，这个客户端基本上涵盖了MD设计风格的核心概念，包括水波纹圆角卡片TabLayout等等。<br>上寨的期初阶段并没有在意太多，就是写UI嘛，和照着美工的效果图来一发是差不多的，看官方UI有什么元素就照着写一个，也确实没什么问题。<br>UI写得差不多了，需要抓取官方的API来给应用获取数据了，比如各种视频的列表，番剧更新等，这一抓不要紧，发现了有意思的东西，在官方app安装完成后首次打开时，我在抓包列表里看到了app在后台通过网络获取了很多.lua后缀的文件，鉴于鄙人在平时喜欢涉猎一些别的领域，对lua还是略有了解的，lua是一个动态脚本语言，常用做游戏开发或者和c/c++交互，在之前玩python的时候还特意了解了一下这个语言。</p>
+<p><strong>那么问题来了，这个app下载这些lua脚本文件到底是用来做什么的？</strong></p>
+<p>打开之后发现这些文件是被加密过的二进制文件，因为好奇就去google百度了一下两个关键词“android lua”，结果发现竟然有一个叫做luajava的库，这是由c编写的和lua交互的库并提供和java通讯的接口！<br>这是什么？这不就上面提到的第四个方案中的最后一个方案的优化版吗？<br>nodejs之所以快是因为用了google的V8引擎，Android肯定不能在App放一个V8用来解析js，因为太大了！<br>但是luajava呢？一共也才几百k，那么接下来就是见证奇迹的时刻了。</p>
+<p>首先在github找到了这个项目的c语言和java源码，然后新建了JNI工程把这些东西编译了一遍，很顺利。<br>接下来就是各种尝试了，lua和java的相互调用，使用lua进行布局，使用lua实现android动画，使用lua实现数据列表…</p>
+<p>随后把这些东西做成了一个库，可以gradle依赖并直接用在生产环境的</p>
+<p>贴上效果：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> LuaState luaState;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.activity_recycler_view);</div><div class="line"></div><div class="line">        luaState = LuaStateFactory.newLuaState();</div><div class="line">        luaState.openLibs();</div><div class="line">        luaState.LdoString(LuaBridge.loadAssets(<span class="keyword">this</span>, <span class="string">"TestActivity.lua"</span>));</div><div class="line"></div><div class="line">        luaState.getField(LuaState.LUA_GLOBALSINDEX, <span class="string">"onCreate"</span>);</div><div class="line">        luaState.pushJavaObject(<span class="keyword">this</span>);</div><div class="line">        luaState.pushJavaObject(((ViewGroup) findViewById(android.R.id.content)).getChildAt(<span class="number">0</span>));</div><div class="line">        luaState.pushJavaObject(savedInstanceState);</div><div class="line">        luaState.call(<span class="number">3</span>, <span class="number">0</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里定义了一个Activity并加载了一个lua脚本文件，这文件放在了assets下，当然如果用于热更新的话需要后台从服务器下载，存储在本地，并使用文件系统来加载。<br>TestActivity.lua<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- TODO 初始化</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">onCreate</span><span class="params">(activity)</span></span></div><div class="line">    activity:setTitle(<span class="string">"这个界面完全由Lua编写"</span>)</div><div class="line">    initUI(activity)</div><div class="line">    addListener(activity)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure></p>
+<p>我们在lua文件里定义了和activity生命周期相同命名的oncreate，如有需要可以扩展onResume/onActivityResult等其他方法。</p>
+<p>新建一个button<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">initUI</span><span class="params">(activity)</span></span></div><div class="line">    <span class="keyword">local</span> id = luajava.bindClass(<span class="string">"com.nightfarmer.luabridge.sample.R$id"</span>)</div><div class="line">    <span class="keyword">local</span> layout = activity:findViewById(id.layout)</div><div class="line"></div><div class="line">    button2 = luajava.newInstance(<span class="string">"android.widget.Button"</span>, activity)</div><div class="line">    button2:setText(<span class="string">"Lua初始化的button"</span>)</div><div class="line">    layout:addView(button2)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure></p>
+<p>添加点击事件，show一个toast<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">addListener</span><span class="params">(activity)</span></span></div><div class="line">    <span class="keyword">local</span> id = luajava.bindClass(<span class="string">"com.nightfarmer.luabridge.sample.R$id"</span>)</div><div class="line">    <span class="keyword">local</span> launchBt = activity:findViewById(id.myLaunchButton)</div><div class="line">    <span class="keyword">local</span> buttonProxy = luajava.createProxy(<span class="string">"android.view.View$OnClickListener"</span>, button_cb)</div><div class="line">    launchBt:setOnClickListener(buttonProxy)</div><div class="line"><span class="keyword">end</span></div><div class="line">button_cb = &#123;&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">button_cb.onClick</span><span class="params">(eventView)</span></span></div><div class="line">    <span class="keyword">local</span> Toast = luajava.bindClass(<span class="string">"android.widget.Toast"</span>);</div><div class="line">    Toast:makeText(eventView:getContext(),<span class="string">"按钮被点击，通过lua发起toast"</span>,<span class="number">0</span>):show()</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure></p>
+<p>创建并执行一个动画<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">button3_cb=&#123;&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">button3_cb.onClick</span><span class="params">(eventView)</span></span></div><div class="line">    <span class="keyword">local</span> Toast = luajava.bindClass(<span class="string">"android.widget.Toast"</span>);</div><div class="line">    Toast:makeText(eventView:getContext(),<span class="string">"按钮被点击，通过lua发起toast"</span>,<span class="number">0</span>):show()</div><div class="line"></div><div class="line">    ObjectAnimator = luajava.bindClass(<span class="string">"com.nightfarmer.luabridge.sample.ObjectAnimator"</span>)</div><div class="line">    <span class="keyword">local</span> animator = ObjectAnimator:ofFloat(button2, <span class="string">"rotation"</span>,<span class="number">0</span>,<span class="number">360</span>)</div><div class="line">    animator:setDuration(<span class="number">1000</span>)</div><div class="line">    animator:start()</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure></p>
+<p>用java代码可用实现的功能基本上在lua脚本中都可以实现，下面贴上一个通过扩展实现的一个RecyclerView的数据列表<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="function">function <span class="title">onCreate</span><span class="params">(activity, rootView)</span></span></div><div class="line">	activity:<span class="title">setTitle</span><span class="params">(<span class="string">"使用Lua脚本构建RecyclerView"</span>)</span></div><div class="line">	context = activity</div><div class="line">        local recyclerView = luajava.newInstance(<span class="string">"com.nightfarmer.luabridge.sample.recyclerview.LuaRecyclerView"</span>, activity)</div><div class="line">	local linearManager = luajava.newInstance(<span class="string">"android.support.v7.widget.LinearLayoutManager"</span>, activity)</div><div class="line">	recyclerView:setLayoutManager(linearManager)</div><div class="line">	rootView:addView(recyclerView)</div><div class="line">	</div><div class="line">	local adapter = luajava.createProxy(<span class="string">"com.nightfarmer.luabridge.sample.recyclerview.LuaRecyclerAdapter"</span>,rec_adapter)</div><div class="line">	recyclerView:setAdapter(adapter)</div><div class="line">end</div><div class="line"></div><div class="line">rec_adapter=&#123;&#125;</div><div class="line">function rec_adapter.onCreateViewHolder(parent, viewType)</div><div class="line">	local button1 =	luajava.newInstance(<span class="string">"android.widget.TextView"</span>,context)</div><div class="line">	button1:setPadding(<span class="number">50</span>,<span class="number">50</span>,<span class="number">50</span>,<span class="number">50</span>)</div><div class="line">	button1:setText(<span class="string">"根据网络Lua脚本动态生成的button.....一可赛艇"</span>)</div><div class="line">	parent:addView(button1)</div><div class="line">	local holder = luajava.newInstance(<span class="string">"com.nightfarmer.luabridge.sample.recyclerview.LuaViewHolder"</span>, button1)</div><div class="line">	holder:putView(<span class="string">"btn1"</span>, button1)</div><div class="line">	<span class="keyword">return</span> holder</div><div class="line">end</div><div class="line"></div><div class="line">function rec_adapter.onBindViewHolder(holder, position)</div><div class="line">	holder:getView(<span class="string">"btn1"</span>):setText(<span class="string">"yoo"</span>..position)</div><div class="line">end</div><div class="line"></div><div class="line">function rec_adapter.getItemCount()</div><div class="line"> 	<span class="keyword">return</span> <span class="number">1000</span></div><div class="line">end</div></pre></td></tr></table></figure></p>
+<p>是不是很刺激，如果把Activity全部使用lua来开发并把文件放在服务器上，那么就是可用实现应用全功能的热更新了。<br>当然这样做的开销也是比较大的，在实际使用中可用定义一个BaseActivity，在打开activity的时候判断这个activity是否有可用的lua脚本文件，来实现用lua脚本动态的替换java代码，比如app发布之后发现某个activity有一个小bug，那么针对这个activity写一个lua脚本就可用让所有联网的用户来执行lua脚本而替换掉有bug的代码。<br>当然如果是首页等活动性比较大的界面完全可以lua来写，比如儿童节教师节情人节什么的，在服务器上放一个lua脚本文件就搞定了。而且用户看到的是原生应用的效果，而不是H5这样的廉价感。</p>
+<p>食用方法：<br>Step 1. 添加build文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">allprojects &#123;</div><div class="line">	repositories &#123;</div><div class="line">		...</div><div class="line">		maven &#123; url &quot;https://jitpack.io&quot; &#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>Step 2. 添加依赖<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">dependencies &#123;</div><div class="line">	compile &apos;com.github.NightFarmer:LuaBridge:1.0.2&apos;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>源码及sample：<a href="https://github.com/NightFarmer/LuaBridge" target="_blank" rel="external">https://github.com/NightFarmer/LuaBridge</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2016/08/19/ProxyRequst/">
+                    使用动态代理对网络请求接口进行面向对象封装
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2016/08/08/CircleWave/">
+                    通过自定义控件绘制实现雷达/水波纹的动画扩散效果
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+
+
+
+    <div class="share">
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+    <a href="#" class="bds_copy" data-cmd="copy" title="复制网址"></a>
+    <a href="#" class="bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+    </div>
+    <script>
+        window._bd_share_config={
+            "common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+</div>
+
+
+
+    
+      <div class="duoshuo" id="comments">
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="2016/08/10/luabridge/" data-title="有关Android热更新/热补丁的一种新的解决方案" data-url="http://nightfarmer.github.io/2016/08/10/luabridge/"></div>
+    <!-- 多说评论框 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"nightfarmer"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://nightfarmer.github.io/js/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+</div>
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2016/08/19/ProxyRequst/" title="上一篇: 使用动态代理对网络请求接口进行面向对象封装">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2016/08/08/CircleWave/" title="下一篇: 通过自定义控件绘制实现雷达/水波纹的动画扩散效果">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/02/14/RnMobX/">在ReactNative中使用MobX框架管理State实现ListView的局部刷新</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/02/DiffUtil/">Android7.0新增工具DiffUtil详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/01/GPSUtil/">WGS84、GCJ02、BD09地图坐标系间的坐标转换及坐标距离计算</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/21/GreenDao3Doc/">SQLite数据库Orm框架GreenDao3使用详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/MediaPlayer/">使用MediaPlayer开发简单的在线音乐播放器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/StethoSummary/">使用来自Facebook的调试神器Stetho对Android应用程序进行调试</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/30/InitWinEnv/">使用Chocolatey包管理器一键搭建windows开发环境</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/22/AutoBuildApk/">Linux开发环境中使用shell/python脚本快速自动打包并查看apk文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/12/InterpolatorPreview/">自定义view展示官方Interpolator并扩展自定义Interpolator</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/09/ScriptIntrinsicBlur/">使用v8兼容包对图片进行高斯模糊处理/毛玻璃效果</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/07/ColorTheme/">给应用增加动态切换主题配色的功能</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/01/RxJavaFuncs/">RxJava常用操作符分类总汇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/31/RxJavaClick/">使用RxJava实现多次连续点击的事件监听</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/24/GoogleMVP/">浅析Google官方AndroidMVP架构示例</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/23/BezierDrawer/">做一个二阶Bezier曲线的绘图工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/19/ProxyRequst/">使用动态代理对网络请求接口进行面向对象封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/10/luabridge/">有关Android热更新/热补丁的一种新的解决方案</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/08/CircleWave/">通过自定义控件绘制实现雷达/水波纹的动画扩散效果</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/04/SatelliteButton/">设计一个通用的卫星菜单</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/03/make-a-wheel/">造一个“轮子”</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/29/make-a-home/">创建一个简单的android桌面APP</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/20/PageViewTab/">为ViewPager创建可自由设置高亮样式的TabBar</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/24/Recycler-Tree/">实现基于RecyclerView的树形组件封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/30/AS-SerialVersionUID/">AndroidStudio 自动生成 SerialVersionUID</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/30/AndroidLocalData/">android轻量级本地数据存储的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/25/ReactNative-libs/">ReactNative的一些参考资料以及第三方库</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/24/RecyAnim/">给滚动列表项增加渐显载入动画</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/17/Kotlin-anko/">使用Kotlin开发Android之anko扩展</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/13/EventBus/">通过EventBus实现android各组件间数据通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/12/Kotlin-yf/">使用Kotlin开发Android的常用技巧</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/25/Kotlin-android-EV/">AndroidStudio-Kotlin插件安装配置及工程配置调整</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/20/js-android/">使用JavaScript反射调用Android应用Native代码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/19/ExpandAnimList/">设计一个带有动画的可用展开/折叠的列表控件</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/16/JitpackUse/">发布自己的开源库到jitpack供gradle依赖调用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/14/listAnim1/">多种样式的列表item动画集合</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/BaseItemAnimator/">通过扩展ItemAnimator实现对Item的创建/移除动画进行抽象封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/RandomShowTextView/">实现一个随机字符显现/隐藏的TextView</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/ItemAnimator/">解析DefaultItemAnimator源码了解ItemAnimator动画处理器实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/12/MoneyInput/">android实现限制数值输入范围的金额EditText控制</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/01/View-onMeasure/">源码解析自定义View的onMeasure方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/15/OKHttpForm/">OKHttp3-多文件form表单形式上传的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/12/OKHttpDownload/">OKHttp3-扩展带有进度监听的下载回调</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/02/openFile/">调用Android设备中已经安装的软件打开各种类型的指定文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/24/AndroidPaintView/">自定义控件-使用Canvas绘图定义一个手写板</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/20/MakeSwitchButton/">自定义控件-定义一个开关按钮</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/23/Recycler-Grid/">使用RecyclerView实现Grid节点的拖拽排序</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/08/Recycler-pbl/">使用RecyclerView实现无限滚动瀑布流</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/03/RecyclerView/">RecyclerView的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/04/20/AS-HotKey/">AndroidStudio常用快捷键记录</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/11/AsyncDoc/">Async.js v2.0.0-pre官方文档翻译(未完成)</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/10/jsbind/">深入浅出 妙用JavaScript中apply、call、bind</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/06/makelianliankan1/">使用cocos2d引擎开发连连看的尝试</a></li><li class="post-list-item"><a class="post-list-link" href="/2014/03/07/AndroidScreenAdaptation/">Android屏幕分率适配</a></li><li class="post-list-item"><a class="post-list-link" href="/2014/03/01/HelloBlog/">Hello Blog</a></li></ul>
+    <script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2017 NightFarmer
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme Yelee by MOxFIVE
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >本站到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>实现基于RecyclerView的树形组件封装 | NightFarmer&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="最近因项目需求需要一个可以进行展开收缩的多级树形控件，首先考虑的是ExpandableListView，但是这个控件只支持一级展开不符合需求，之后在百度谷歌了一下发现有用List实现的多级树形控件，预览效果是不错的，但是经测试大量数据展开时会造成严重的卡顿现象，也不符合需求。最终决定以RecyclerView封装一个可服用的多级树形组件，以满足大量数据的展开折叠，以及展开折叠的动画效果。
+最终效果">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实现基于RecyclerView的树形组件封装">
+<meta property="og:url" content="http://nightfarmer.github.io/2016/06/24/Recycler-Tree/index.html">
+<meta property="og:site_name" content="NightFarmer's Blog">
+<meta property="og:description" content="最近因项目需求需要一个可以进行展开收缩的多级树形控件，首先考虑的是ExpandableListView，但是这个控件只支持一级展开不符合需求，之后在百度谷歌了一下发现有用List实现的多级树形控件，预览效果是不错的，但是经测试大量数据展开时会造成严重的卡顿现象，也不符合需求。最终决定以RecyclerView封装一个可服用的多级树形组件，以满足大量数据的展开折叠，以及展开折叠的动画效果。
+最终效果">
+<meta property="og:image" content="http://nightfarmer.github.io/public/static/image/staffTree.gif">
+<meta property="og:image" content="http://nightfarmer.github.io/public/static/image/treetest.gif">
+<meta property="og:updated_time" content="2017-02-14T01:08:44.980Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="实现基于RecyclerView的树形组件封装">
+<meta name="twitter:description" content="最近因项目需求需要一个可以进行展开收缩的多级树形控件，首先考虑的是ExpandableListView，但是这个控件只支持一级展开不符合需求，之后在百度谷歌了一下发现有用List实现的多级树形控件，预览效果是不错的，但是经测试大量数据展开时会造成严重的卡顿现象，也不符合需求。最终决定以RecyclerView封装一个可服用的多级树形组件，以满足大量数据的展开折叠，以及展开折叠的动画效果。
+最终效果">
+<meta name="twitter:image" content="http://nightfarmer.github.io/public/static/image/staffTree.gif">
+  
+    <link rel="alternative" href="/atom.xml" title="NightFarmer&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false,
+      }
+  </script>
+
+  
+      <script>
+          yiliaConfig.rootUrl = "/";
+      </script>
+  
+
+  
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn js-avatar">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">NightFarmer</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">理论指导实践，实践深化理论</p>
+        
+                
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <li id="Email"><a class="Email" target="_blank" href="mailto:494090597@qq.com" title="Email"></a></li>
+                            
+                                <li id="新浪微博"><a class="新浪微博" target="_blank" href="http://weibo.com/NightFarmer" title="新浪微博"></a></li>
+                            
+                                <li id="GitHub"><a class="GitHub" target="_blank" href="https://github.com/NightFarmer" title="GitHub"></a></li>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/AS/" style="font-size: 11.43px;">AS</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Android架构/" style="font-size: 10px;">Android架构</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Bezier曲线/" style="font-size: 10px;">Bezier曲线</a> <a href="/tags/Doc/" style="font-size: 10px;">Doc</a> <a href="/tags/EventBus/" style="font-size: 10px;">EventBus</a> <a href="/tags/File/" style="font-size: 10px;">File</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.86px;">JavaScript</a> <a href="/tags/Kotlin/" style="font-size: 12.86px;">Kotlin</a> <a href="/tags/Lua/" style="font-size: 10px;">Lua</a> <a href="/tags/NDK/" style="font-size: 10px;">NDK</a> <a href="/tags/ReactNative/" style="font-size: 11.43px;">ReactNative</a> <a href="/tags/RecyclerView/" style="font-size: 18.57px;">RecyclerView</a> <a href="/tags/RxAndroid/" style="font-size: 11.43px;">RxAndroid</a> <a href="/tags/RxJava/" style="font-size: 11.43px;">RxJava</a> <a href="/tags/ViewPager/" style="font-size: 10px;">ViewPager</a> <a href="/tags/cocos/" style="font-size: 10px;">cocos</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/okhttp/" style="font-size: 11.43px;">okhttp</a> <a href="/tags/orm/" style="font-size: 10px;">orm</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/列表动画/" style="font-size: 14.29px;">列表动画</a> <a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a> <a href="/tags/动画/" style="font-size: 15.71px;">动画</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/干货/" style="font-size: 17.14px;">干货</a> <a href="/tags/数据存储/" style="font-size: 10px;">数据存储</a> <a href="/tags/数据库/" style="font-size: 10px;">数据库</a> <a href="/tags/热更新/" style="font-size: 10px;">热更新</a> <a href="/tags/特效/" style="font-size: 10px;">特效</a> <a href="/tags/自定义控件/" style="font-size: 17.14px;">自定义控件</a> <a href="/tags/适配/" style="font-size: 10px;">适配</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://git.oschina.net/">Git@OSC</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我就是我 是颜色不一样的烟火</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">NightFarmer</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">NightFarmer</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">理论指导实践，实践深化理论</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <li id="Email"><a class="Email" target="_blank" href="mailto:494090597@qq.com" title="Email"></a></li>
+                            
+                                <li id="新浪微博"><a class="新浪微博" target="_blank" href="http://weibo.com/NightFarmer" title="新浪微博"></a></li>
+                            
+                                <li id="GitHub"><a class="GitHub" target="_blank" href="https://github.com/NightFarmer" title="GitHub"></a></li>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-Recycler-Tree" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/06/24/Recycler-Tree/" class="article-date">
+      <time datetime="2016-06-24T07:26:17.000Z" itemprop="datePublished">2016-06-24</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      实现基于RecyclerView的树形组件封装
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RecyclerView/">RecyclerView</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>最近因项目需求需要一个可以进行展开收缩的多级树形控件，首先考虑的是ExpandableListView，但是这个控件只支持一级展开不符合需求，<br>之后在百度谷歌了一下发现有用List实现的多级树形控件，预览效果是不错的，但是经测试大量数据展开时会造成严重的卡顿现象，也不符合需求。<br>最终决定以RecyclerView封装一个可服用的多级树形组件，以满足大量数据的展开折叠，以及展开折叠的动画效果。</p>
+<p>最终效果图：<br><a id="more"></a><br><img src="http://nightfarmer.github.io/public/static/image/staffTree.gif" alt="员工效果图"></p>
+<p>这个树形组件是在RecyclerView的基础上对Adapter进行了封装，在使用时可以使用原生的RecyclerView设定为树形结构的Adapter即可实现树形的效果。</p>
+<p>首先我们定义一个枚举来标识树形节点的类型(叶子/分支)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 节点类型</div><div class="line"> * Created by zhangfan on 16-6-24.</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="keyword">enum</span> NodeType &#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 分组节点，可打开</div><div class="line">     */</div><div class="line">    BRANCH,</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 叶子节点</div><div class="line">     */</div><div class="line">    LEAF</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>接下来我们考虑树形节点的数据存储模型，有两种方案，一种是定义一个节点抽象类，另一种是定义一个节点接口。<br>这两种方案对于开发者来说，抽象类可以存储组件开放过程中需要的一些临时数据，更加方便，而接口则需要组件使用其他折中的方法来存储节点的临时数据<br>而对于调用者来说，继承一个接口会更加的灵活，而且不需要额外的数据转换开销，而继承抽象类则会约束使用者只能将父类指定为组件提供的类，在通过其他途径拿到节点数据之后还要进行额外的转换(如数据库/网络等)。</p>
+<p>这里为了确保组件在使用过程中能更加的简洁清爽，更小的入侵性，我们采用接口来定义树形节点：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 树形节点</div><div class="line"> * Created by zhangfan on 16-6-24.</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">TreeNode</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     *获取子节点</div><div class="line">     */</div><div class="line">    ArrayList&lt;? extends TreeNode&gt; getChildren();</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     *获取节点名称</div><div class="line">     */</div><div class="line">    <span class="function">String <span class="title">getTitle</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     *获取节点类型</div><div class="line">     */</div><div class="line">    <span class="function">NodeType <span class="title">getNodeType</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这样我们的数据模型已经定义完毕，然后我需要定义一个拥有树形特性的Adapter来让RecyclerView具有树形控件的特性。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * 树形adapter</div><div class="line"> * Created by zhangfan on 16-6-24.</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">RecyclerTreeAdapter</span>&lt;<span class="title">N</span> <span class="keyword">extends</span> <span class="title">TreeNode</span>, <span class="title">T</span> <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">ViewHolder</span>&gt; <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">Adapter</span>&lt;<span class="title">T</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    ArrayList&lt;N&gt; dataList = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line"></div><div class="line">    HashMap&lt;N, Boolean&gt; nodeChildrenStatusMap = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line"></div><div class="line">    HashMap&lt;N, Integer&gt; nodeLevelMap = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line"></div><div class="line">    HashSet&lt;N&gt; checkedNodes = <span class="keyword">new</span> HashSet&lt;&gt;();</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * <span class="doctag">@return</span> 每级缩进，单位px</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">int</span> <span class="title">indentPerLevel</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * <span class="doctag">@param</span> dataList 已传入的数据参数在控件展开和折叠后会产生变化，不可在其他地方引用或使用</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RecyclerTreeAdapter</span><span class="params">(List&lt;N&gt; dataList)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.dataList.addAll(dataList);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> ArrayList&lt;N&gt; <span class="title">getCheckedNodes</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ArrayList&lt;&gt;(checkedNodes);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> T <span class="title">onCreateViewHolder</span><span class="params">(ViewGroup parent, <span class="keyword">int</span> viewType)</span> </span>&#123;</div><div class="line">        NodeType nodeType;</div><div class="line">        <span class="keyword">if</span> (viewType == <span class="number">0</span>) &#123;</div><div class="line">            nodeType = NodeType.LEAF;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            nodeType = NodeType.BRANCH;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> onCreateViewHolder(parent, nodeType);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> T <span class="title">onCreateViewHolder</span><span class="params">(ViewGroup parent, NodeType nodeType)</span></span>;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">onBindViewHolder</span><span class="params">(<span class="keyword">final</span> T holder, <span class="keyword">int</span> position)</span> </span>&#123;</div><div class="line">        N treeNode = dataList.get(position);</div><div class="line">        Integer integerLevel = nodeLevelMap.get(treeNode);</div><div class="line">        <span class="keyword">int</span> level = integerLevel == <span class="keyword">null</span> ? <span class="number">0</span> : integerLevel;</div><div class="line">        onBindViewHolder(holder, treeNode);</div><div class="line">        <span class="keyword">final</span> View itemView = holder.itemView;</div><div class="line">        itemView.setPadding(level * indentPerLevel(), itemView.getPaddingTop(),</div><div class="line">                itemView.getPaddingRight(), itemView.getPaddingBottom());</div><div class="line">        itemView.setTag(treeNode);</div><div class="line">        itemView.setClickable(<span class="keyword">true</span>);</div><div class="line">        itemView.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View view)</span> </span>&#123;</div><div class="line">                N treeNode = (N) itemView.getTag();</div><div class="line">                <span class="keyword">switch</span> (treeNode.getNodeType()) &#123;</div><div class="line">                    <span class="keyword">case</span> BRANCH:</div><div class="line"></div><div class="line">                        <span class="keyword">int</span> location = dataList.indexOf(treeNode);</div><div class="line">                        ArrayList&lt;? extends TreeNode&gt; children = treeNode.getChildren();</div><div class="line">                        <span class="keyword">if</span> (children.size() &gt; <span class="number">0</span>) &#123;</div><div class="line">                            Boolean aBoolean = nodeChildrenStatusMap.get(treeNode);</div><div class="line">                            <span class="keyword">boolean</span> isShowChildren = aBoolean != <span class="keyword">null</span> &amp;&amp; aBoolean;</div><div class="line">                            <span class="keyword">if</span> (isShowChildren) &#123;</div><div class="line">                                List&lt;N&gt; allShowedChildren = getAllShowedChildren(treeNode);</div><div class="line">                                dataList.removeAll(allShowedChildren);</div><div class="line">                                notifyItemRangeRemoved(location + <span class="number">1</span>, allShowedChildren.size());</div><div class="line">                                updateChildrenStatusMap(treeNode, <span class="keyword">false</span>);</div><div class="line">                            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                                Integer integer = nodeLevelMap.get(treeNode);</div><div class="line">                                <span class="keyword">int</span> thisLevel = integer == <span class="keyword">null</span> ? <span class="number">0</span> : integer;</div><div class="line">                                <span class="keyword">for</span> (TreeNode n :</div><div class="line">                                        children) &#123;</div><div class="line">                                    nodeLevelMap.put((N) n, thisLevel + <span class="number">1</span>);</div><div class="line">                                &#125;</div><div class="line">                                dataList.addAll(location + <span class="number">1</span>, (Collection&lt;? extends N&gt;) children);</div><div class="line">                                notifyItemRangeInserted(location + <span class="number">1</span>, children.size());</div><div class="line">                                nodeChildrenStatusMap.put(treeNode, <span class="keyword">true</span>);</div><div class="line">                            &#125;</div><div class="line">                        &#125;</div><div class="line">                        <span class="keyword">break</span>;</div><div class="line"></div><div class="line">                    <span class="keyword">case</span> LEAF:</div><div class="line">                        <span class="keyword">boolean</span> checked = checkedNodes.contains(treeNode);</div><div class="line">                        setNodeChecked(treeNode, !checked);</div><div class="line">                        onLeafTouch(treeNode);</div><div class="line">                        <span class="keyword">break</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">updateChildrenStatusMap</span><span class="params">(N treeNode, <span class="keyword">boolean</span> isShowChildren)</span> </span>&#123;</div><div class="line">        nodeChildrenStatusMap.put(treeNode, isShowChildren);</div><div class="line">        ArrayList&lt;? extends TreeNode&gt; children = treeNode.getChildren();</div><div class="line">        <span class="keyword">if</span> (children == <span class="keyword">null</span>) <span class="keyword">return</span>;</div><div class="line">        <span class="keyword">for</span> (TreeNode n :</div><div class="line">                children) &#123;</div><div class="line">            Boolean aBoolean = nodeChildrenStatusMap.get(n);</div><div class="line">            <span class="keyword">if</span> ((aBoolean != <span class="keyword">null</span> &amp;&amp; aBoolean) == isShowChildren) <span class="keyword">continue</span>;</div><div class="line">            updateChildrenStatusMap((N) n, isShowChildren);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> List&lt;N&gt; <span class="title">getAllShowedChildren</span><span class="params">(N treeNode)</span> </span>&#123;</div><div class="line">        List&lt;N&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">        Boolean aBoolean = nodeChildrenStatusMap.get(treeNode);</div><div class="line">        <span class="keyword">boolean</span> showed = aBoolean != <span class="keyword">null</span> &amp;&amp; aBoolean;</div><div class="line">        <span class="keyword">if</span> (showed) &#123;</div><div class="line">            ArrayList&lt;? extends TreeNode&gt; children = treeNode.getChildren();</div><div class="line">            <span class="keyword">if</span> (children == <span class="keyword">null</span>) <span class="keyword">return</span> result;</div><div class="line">            result.addAll((Collection&lt;? extends N&gt;) children);</div><div class="line">            <span class="keyword">for</span> (TreeNode n : children) &#123;</div><div class="line">                result.addAll(getAllShowedChildren((N) n));</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> result;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onLeafTouch</span><span class="params">(N treeNode)</span> </span>&#123;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNodeChecked</span><span class="params">(N treeNode, <span class="keyword">boolean</span> checked)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (checked) &#123;</div><div class="line">            checkedNodes.add(treeNode);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            checkedNodes.remove(treeNode);</div><div class="line">        &#125;</div><div class="line">        ArrayList&lt;? extends TreeNode&gt; children = treeNode.getChildren();</div><div class="line">        <span class="keyword">if</span> (children == <span class="keyword">null</span>) <span class="keyword">return</span>;</div><div class="line">        <span class="keyword">for</span> (TreeNode n : children) &#123;</div><div class="line">            setNodeChecked((N) n, checked);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 获取节点层级，只能获取已经加载的节点</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> treeNode 节点</div><div class="line">     * <span class="doctag">@return</span> 节点层级，从0开始</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getNodeLevel</span><span class="params">(N treeNode)</span> </span>&#123;</div><div class="line">        Integer integer = nodeLevelMap.get(treeNode);</div><div class="line">        <span class="keyword">return</span> integer == <span class="keyword">null</span> ? <span class="number">0</span> : integer;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 数据和UI绑定</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> holder   holder内itemView的tag方法已被使用，不建议重新设置该值</div><div class="line">     * <span class="doctag">@param</span> treeNode 节点数据</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">onBindViewHolder</span><span class="params">(T holder, N treeNode)</span></span>;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 节点类型，1分支，0叶子</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> position</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     */</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getItemViewType</span><span class="params">(<span class="keyword">int</span> position)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> NodeType.BRANCH.equals(dataList.get(position).getNodeType()) ? <span class="number">1</span> : <span class="number">0</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getItemCount</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> dataList.size();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在RecyclerTreeAdapter中根据节点类型来绑定节点的点击事件，分支节点的点击事件指定为展开/折叠子节点，叶子节点的点击事件则通过onLeafTouch方法回调给具体的Adapter实现类。<br>而树形结构的缩进则是通过计算出节点的所属层级，给相应节点的View设定leftPadding。<br>这里可能会注意到，在RecyclerTreeAdapter中定义了一些Map这样的结构数据，这是因为我们采用了接口来定义节点，所以节点的展开/收缩状态以及节点的层级数据都不能够存储在节点中，所以需要这些数据结构来存储这些堆数据。</p>
+<p>至此，我们的树形控件已经全部封装完毕，下面看一下这个控件该如何使用<br>首先让我们的节点类实现TreeNode<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> *</div><div class="line"> * Created by zhangfan on 16-6-24.</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestNode</span> <span class="keyword">implements</span> <span class="title">TreeNode</span> </span>&#123;</div><div class="line">    ArrayList&lt;TestNode&gt; children;</div><div class="line">    String name;</div><div class="line">    NodeType type = NodeType.BRANCH;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TestNode</span><span class="params">(ArrayList&lt;TestNode&gt; children, String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.children = children;</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="keyword">public</span> ArrayList&lt;? extends TreeNode&gt; getChildren() &#123;</div><div class="line">        <span class="keyword">return</span> children;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getTitle</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> NodeType <span class="title">getNodeType</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> type;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>然后定义一个Adapter继承自刚才的RecyclerTreeAdapter<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 树形Adapter的实现</div><div class="line"> * Created by zhangfan on 16-6-24.</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyTreeAdapter</span> <span class="keyword">extends</span> <span class="title">RecyclerTreeAdapter</span>&lt;<span class="title">TestNode</span>, <span class="title">MyTreeAdapter</span>.<span class="title">MyHolder</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Context context;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * <span class="doctag">@param</span> dataList 已传入的数据参数在控件展开和折叠后会产生变化，不可在其他地方引用或使用</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyTreeAdapter</span><span class="params">(List&lt;TestNode&gt; dataList, Context context)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(dataList);</div><div class="line">        <span class="keyword">this</span>.context = context;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">indentPerLevel</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="number">50</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> MyHolder <span class="title">onCreateViewHolder</span><span class="params">(ViewGroup parent, NodeType nodeType)</span> </span>&#123;</div><div class="line">        View inflate = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">switch</span> (nodeType) &#123;</div><div class="line">            <span class="keyword">case</span> LEAF:</div><div class="line">                inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.treeitem2, parent, <span class="keyword">false</span>);</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> BRANCH:</div><div class="line">                inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.treeitem, parent, <span class="keyword">false</span>);</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MyHolder(inflate);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onBindViewHolder</span><span class="params">(MyHolder holder, TestNode treeNode)</span> </span>&#123;</div><div class="line">        holder.tv.setText(<span class="string">""</span> + treeNode.getTitle() + <span class="string">",第"</span> + getNodeLevel(treeNode) + <span class="string">"层"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyHolder</span> <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">ViewHolder</span> </span>&#123;</div><div class="line">        TextView tv;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MyHolder</span><span class="params">(View itemView)</span> </span>&#123;</div><div class="line">            <span class="keyword">super</span>(itemView);</div><div class="line">            tv = (TextView) itemView.findViewById(R.id.title);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onLeafTouch</span><span class="params">(TestNode treeNode)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onLeafTouch(treeNode);</div><div class="line">        Toast.makeText(context, <span class="string">"点到叶子了:"</span> + treeNode.getTitle() + <span class="string">",第"</span> + getNodeLevel(treeNode) + <span class="string">"层"</span>, Toast.LENGTH_SHORT).show();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在这个adapter中我们可用根据节点类型的不同来生成同步类型的节点View<br>然后在Activity中造一些模拟数据给RecyclerView指定Adapter<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.activity_main);</div><div class="line">        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);</div><div class="line"></div><div class="line">        ArrayList&lt;TestNode&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line"></div><div class="line">        ArrayList&lt;TestNode&gt; nodes1 = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">        TestNode node1 = <span class="keyword">new</span> TestNode(nodes1, <span class="string">"1层"</span>);</div><div class="line">        list.add(node1);</div><div class="line"></div><div class="line">        ArrayList&lt;TestNode&gt; nodes2 = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">        TestNode node2 = <span class="keyword">new</span> TestNode(nodes2, <span class="string">"2层"</span>);</div><div class="line">        nodes1.add(node2);</div><div class="line"></div><div class="line">        ArrayList&lt;TestNode&gt; nodes3 = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">        TestNode node3 = <span class="keyword">new</span> TestNode(nodes3, <span class="string">"3层"</span>);</div><div class="line">        nodes2.add(node3);</div><div class="line"></div><div class="line">        ArrayList&lt;TestNode&gt; nodes4 = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">        TestNode node4 = <span class="keyword">new</span> TestNode(nodes4, <span class="string">"4层"</span>);</div><div class="line">        node4.type = NodeType.LEAF;</div><div class="line">        nodes3.add(node4);</div><div class="line"></div><div class="line">        recyclerView.setLayoutManager(<span class="keyword">new</span> LinearLayoutManager(<span class="keyword">this</span>));</div><div class="line">        recyclerView.setAdapter(<span class="keyword">new</span> MyTreeAdapter(list, <span class="keyword">this</span>));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>大功告成，效果图：<br><img src="http://nightfarmer.github.io/public/static/image/treetest.gif" alt="treeDemo"></p>
+<p>代码地址：<a href="https://github.com/NightFarmer/RecyclerTree" target="_blank" rel="external">https://github.com/NightFarmer/RecyclerTree</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2016/07/20/PageViewTab/">
+                    为ViewPager创建可自由设置高亮样式的TabBar
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2016/05/30/AS-SerialVersionUID/">
+                    AndroidStudio 自动生成 SerialVersionUID
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+
+
+
+    <div class="share">
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+    <a href="#" class="bds_copy" data-cmd="copy" title="复制网址"></a>
+    <a href="#" class="bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+    </div>
+    <script>
+        window._bd_share_config={
+            "common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+</div>
+
+
+
+    
+      <div class="duoshuo" id="comments">
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="2016/06/24/Recycler-Tree/" data-title="实现基于RecyclerView的树形组件封装" data-url="http://nightfarmer.github.io/2016/06/24/Recycler-Tree/"></div>
+    <!-- 多说评论框 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"nightfarmer"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://nightfarmer.github.io/js/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+</div>
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2016/07/20/PageViewTab/" title="上一篇: 为ViewPager创建可自由设置高亮样式的TabBar">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2016/05/30/AS-SerialVersionUID/" title="下一篇: AndroidStudio 自动生成 SerialVersionUID">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/02/14/RnMobX/">在ReactNative中使用MobX框架管理State实现ListView的局部刷新</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/02/DiffUtil/">Android7.0新增工具DiffUtil详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/01/GPSUtil/">WGS84、GCJ02、BD09地图坐标系间的坐标转换及坐标距离计算</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/21/GreenDao3Doc/">SQLite数据库Orm框架GreenDao3使用详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/MediaPlayer/">使用MediaPlayer开发简单的在线音乐播放器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/StethoSummary/">使用来自Facebook的调试神器Stetho对Android应用程序进行调试</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/30/InitWinEnv/">使用Chocolatey包管理器一键搭建windows开发环境</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/22/AutoBuildApk/">Linux开发环境中使用shell/python脚本快速自动打包并查看apk文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/12/InterpolatorPreview/">自定义view展示官方Interpolator并扩展自定义Interpolator</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/09/ScriptIntrinsicBlur/">使用v8兼容包对图片进行高斯模糊处理/毛玻璃效果</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/07/ColorTheme/">给应用增加动态切换主题配色的功能</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/01/RxJavaFuncs/">RxJava常用操作符分类总汇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/31/RxJavaClick/">使用RxJava实现多次连续点击的事件监听</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/24/GoogleMVP/">浅析Google官方AndroidMVP架构示例</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/23/BezierDrawer/">做一个二阶Bezier曲线的绘图工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/19/ProxyRequst/">使用动态代理对网络请求接口进行面向对象封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/10/luabridge/">有关Android热更新/热补丁的一种新的解决方案</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/08/CircleWave/">通过自定义控件绘制实现雷达/水波纹的动画扩散效果</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/04/SatelliteButton/">设计一个通用的卫星菜单</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/03/make-a-wheel/">造一个“轮子”</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/29/make-a-home/">创建一个简单的android桌面APP</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/20/PageViewTab/">为ViewPager创建可自由设置高亮样式的TabBar</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/24/Recycler-Tree/">实现基于RecyclerView的树形组件封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/30/AS-SerialVersionUID/">AndroidStudio 自动生成 SerialVersionUID</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/30/AndroidLocalData/">android轻量级本地数据存储的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/25/ReactNative-libs/">ReactNative的一些参考资料以及第三方库</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/24/RecyAnim/">给滚动列表项增加渐显载入动画</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/17/Kotlin-anko/">使用Kotlin开发Android之anko扩展</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/13/EventBus/">通过EventBus实现android各组件间数据通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/12/Kotlin-yf/">使用Kotlin开发Android的常用技巧</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/25/Kotlin-android-EV/">AndroidStudio-Kotlin插件安装配置及工程配置调整</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/20/js-android/">使用JavaScript反射调用Android应用Native代码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/19/ExpandAnimList/">设计一个带有动画的可用展开/折叠的列表控件</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/16/JitpackUse/">发布自己的开源库到jitpack供gradle依赖调用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/14/listAnim1/">多种样式的列表item动画集合</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/BaseItemAnimator/">通过扩展ItemAnimator实现对Item的创建/移除动画进行抽象封装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/RandomShowTextView/">实现一个随机字符显现/隐藏的TextView</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/13/ItemAnimator/">解析DefaultItemAnimator源码了解ItemAnimator动画处理器实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/12/MoneyInput/">android实现限制数值输入范围的金额EditText控制</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/01/View-onMeasure/">源码解析自定义View的onMeasure方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/15/OKHttpForm/">OKHttp3-多文件form表单形式上传的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/12/OKHttpDownload/">OKHttp3-扩展带有进度监听的下载回调</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/01/02/openFile/">调用Android设备中已经安装的软件打开各种类型的指定文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/24/AndroidPaintView/">自定义控件-使用Canvas绘图定义一个手写板</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/20/MakeSwitchButton/">自定义控件-定义一个开关按钮</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/23/Recycler-Grid/">使用RecyclerView实现Grid节点的拖拽排序</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/08/Recycler-pbl/">使用RecyclerView实现无限滚动瀑布流</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/06/03/RecyclerView/">RecyclerView的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/04/20/AS-HotKey/">AndroidStudio常用快捷键记录</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/11/AsyncDoc/">Async.js v2.0.0-pre官方文档翻译(未完成)</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/10/jsbind/">深入浅出 妙用JavaScript中apply、call、bind</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/06/makelianliankan1/">使用cocos2d引擎开发连连看的尝试</a></li><li class="post-list-item"><a class="post-list-link" href="/2014/03/07/AndroidScreenAdaptation/">Android屏幕分率适配</a></li><li class="post-list-item"><a class="post-list-link" href="/2014/03/01/HelloBlog/">Hello Blog</a></li></ul>
+    <script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2017 NightFarmer
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme Yelee by MOxFIVE
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >本站到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
