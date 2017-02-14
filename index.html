@@ -240,7 +240,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/02/14/RnMobX/">在ReactNative中使用MobX框架管理State实现ListView的局部刷新</a>
+      <a class="article-title" href="/2017/02/14/RnMobX/">在ReactNative中使用MobX框架管理State实现ListView的局部更新</a>
     </h1>
   
 
@@ -250,7 +250,7 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-              <p>在ReactNative中UI的刷新大多数情况依赖于state的变更，通过调用组件的setState方法来更新state以达到通知组件重新渲染UI的目的。当然这种做法是官方提供的标准解决方案，在进行简单UI设计时足以满足大多数需求。<br>但是当遇到结构复杂并存在数据交互的界面设计时，手动管理state这种做法则会把代码逻辑变得非常混乱，组件内不但要负责UI的渲染，还要兼顾state的变更以及不同组件间数据的传递和同步。当项目遇到这种时，引入一个状态管理框架则显得尤为重要。<br>本篇则着重以一个List的数据展示及更新的例子来展开，记录如何在ReactNative中使用<code>MobX</code>框架来代替手动管理state更新Ui，以及如何实现最小粒度的界面渲染。<br>下面两图分别是不做任何处理的全局更新列表数据和使用<code>MobX</code>框架局部更新列表数据的运行效果，可以看到在使用<code>MobX</code>框架在更新行数据时只会重新渲染当前行的组件，而全局更新则会将ListView中的所有ItemView全部渲染一次，同时在实际操作中也会感到明细的卡顿。<br><img src="http://nightfarmer.github.io/public/static/image/rnListRefresh.gif" alt="image"> <img src="http://nightfarmer.github.io/public/static/image/mobxListRefresh.gif" alt="image"><br>
+              <p>在ReactNative中UI的刷新大多数情况依赖于state的变更，通过调用组件的setState方法来更新state以达到通知组件重新渲染UI的目的。当然这种做法是官方提供的标准解决方案，在进行简单UI设计时足以满足大多数需求。<br>但是当遇到结构复杂并存在数据交互的界面设计时，手动管理state这种做法则会把代码逻辑变得非常混乱，组件内不但要负责UI的渲染，还要兼顾state的变更以及不同组件间数据的传递和同步。当项目遇到这种时，引入一个状态管理框架则显得尤为重要。<br>本篇则着重以一个List的数据展示及更新的例子来展开，记录如何在ReactNative中使用<code>MobX</code>框架来代替手动管理state更新Ui，以及如何实现最小粒度的界面渲染。<br>下面两图分别是不做任何处理的全局更新列表数据和使用<code>MobX</code>框架局部更新列表数据的运行效果，可以看到在使用<code>MobX</code>框架在更新行数据时只会重新渲染当前行的组件，而全局更新则会将ListView中的所有ItemView全部渲染一次，同时在实际操作中也会感到细微的卡顿。<br><img src="http://nightfarmer.github.io/public/static/image/rnListRefresh.gif" alt="image"> <img src="http://nightfarmer.github.io/public/static/image/mobxListRefresh.gif" alt="image"><br>
           
       
     </div>
